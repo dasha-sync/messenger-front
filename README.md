@@ -1,4 +1,4 @@
-# Talk Wire
+# Talk Wire Frontend
 a.k.a. Telegram
 
 [Infrastructure](https://github.com/dasha-sync/messenger-infra)
