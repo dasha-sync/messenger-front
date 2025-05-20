@@ -9,3 +9,8 @@ a.k.a. Telegram
 - React
 - Bootstrap
 - JavaScript
+
+Run
+```sh
+$ npm run dev
+```

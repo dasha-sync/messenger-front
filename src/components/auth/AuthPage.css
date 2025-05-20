@@ -1,0 +1,10 @@
+.welcome-text {
+    color: #3576d8;
+    margin-bottom: 10%;
+    font-size: 150px;
+    min-width: max-content;
+}
+
+.text-center {
+    width: max-content;
+}
