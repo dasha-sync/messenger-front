@@ -1,0 +1,18 @@
+.modal-content {
+    border: 1px solid #454a4e !important;
+    /* border-secondary color */
+    border-radius: 0.5rem;
+}
+
+.modal-header,
+.modal-body,
+.modal-footer {
+    border-color: #454a4e !important;
+    /* border-secondary color */
+}
+
+/* Убираем белые углы */
+.modal-content::before,
+.modal-content::after {
+    display: none;
+}
