@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Button, Container, Spinner, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api/config';
-import { AUTH, USERS } from '../../api/routes';
+import api from '../../../api/config';
+import { AUTH, USERS } from '../../../api/routes';
 import './SettingsForm.css';
 
 
@@ -80,7 +80,6 @@ const SettingsForm = () => {
             handleError(err)
         } finally {
             setIsLoading(false);
-            setShowPasswordModal(false);
         }
     };
 
@@ -104,9 +103,9 @@ const SettingsForm = () => {
 
     return (
         <>
-            <Container className="mt-5">
+            <Container>
                 <Form onSubmit={handleSubmit} className="mx-auto bg-dark text-light p-4 rounded" style={{ maxWidth: '400px' }}>
-                    <h2 className="mb-4 text-light">Update Profile</h2>
+                    <h2 className="mb-4 text-light centerize-form">Update Profile</h2>
                     {error && <div className="text-danger mb-3 text-start w-100" style={{ whiteSpace: 'pre-line' }}>{error}</div>}
 
                     <Form.Group className="mb-3">

@@ -1,5 +1,5 @@
 .welcome-text {
-    color: #3576d8;
+    color: #a4a8ff;
     margin-bottom: 10%;
     font-size: 150px;
     min-width: max-content;
@@ -7,4 +7,12 @@
 
 .text-center {
     width: max-content;
+}
+
+.centerize {
+    margin-top: 130%;
+}
+
+.centerize-form {
+    margin-top: 70%;
 }
