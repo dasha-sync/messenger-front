@@ -1,0 +1,25 @@
+.welcome-text {
+    color: #a4a8ff;
+    margin-bottom: 2rem;
+    font-size: 4rem;
+}
+
+.chats-container,
+.chat-container {
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.chats-container {
+    min-width: 30%;
+}
+
+.username {
+    color: #646cff
+}
+
+.btn-outline-light {
+    border-color: #646cff;
+    color: #646cff;
+}

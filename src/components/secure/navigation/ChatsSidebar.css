@@ -1,0 +1,56 @@
+.custom-tabs .nav-link.active {
+    border-bottom-color: var(--bs-tertiary-bg);
+    background-color: var(--bs-tertiary-bg);
+    white-space: nowrap;
+}
+
+.hover-border:hover {
+    border: 1px solid #646cff !important;
+    margin-bottom: 2px;
+}
+
+.hover-border {
+    margin-bottom: 3px;
+    border-radius: 8px !important;
+}
+
+.hover-border:first-child:hover {
+    margin-bottom: 3px;
+}
+
+.nav-link {
+    color: #a4a8ff;
+}
+
+.nav-link:hover {
+    color: #a4a8ff;
+}
+
+.list {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.list-parent {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.search {
+    flex-shrink: 0;
+}
+
+.horizontal-scroll {
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 5%;
+}
+
+@media (max-width: 1620px) {
+    .horizontal-scroll {
+        overflow-x: auto;
+        white-space: nowrap;
+        height: 7%;
+    }
+}

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import AuthPage from './components/auth/AuthPage';
-import SignInForm from './components/auth/SignInForm';
-import SignUpForm from './components/auth/SignUpForm';
+import SignInForm from './components/auth/forms/SignInForm';
+import SignUpForm from './components/auth/forms/SignUpForm';
 import SecurePage from './components/secure/SecurePage';
-import SettingsForm from './components/secure/SettingsForm';
+import SettingsForm from './components/secure/settings/SettingsForm';
 import './App.css';
 
 const ProtectedRoute = ({ children }) => {

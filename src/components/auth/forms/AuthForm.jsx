@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuth } from '../../../hooks/useAuth';
 
 const AuthForm = ({ mode = 'signin' }) => {
     const navigate = useNavigate();
@@ -49,9 +49,9 @@ const AuthForm = ({ mode = 'signin' }) => {
     ];
 
     return (
-        <Container className="mt-5">
+        <Container>
             <Form onSubmit={handleSubmit} className="mx-auto bg-dark text-light p-4 rounded" style={{ maxWidth: '400px' }}>
-                <h2 className="mb-4 text-light">{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
+                <h2 className="mb-4 text-light centerize-form">{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
                 {error && (
                     <div className="text-danger mb-3 text-start w-100" style={{ whiteSpace: 'pre-line' }}>
                         {error}
