@@ -54,3 +54,18 @@
         height: 7%;
     }
 }
+
+.notification-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 6px;
+    margin-bottom: 8px;
+    background-color: rgb(206, 0, 27);
+    border-radius: 50%;
+}
+
+.incoming-request {
+    display: flex;
+
+}

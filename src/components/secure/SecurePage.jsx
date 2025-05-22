@@ -35,7 +35,7 @@ const SecurePage = () => {
             <div className="flex-grow-1 d-flex px-3">
                 <div className="d-flex w-100">
                     <ChatsSidebar />
-                    <div className="chat-container bg-body-tertiary border rounded-3 ms-3" style={{ width: '75%', minHeight: '100%' }}>
+                    <div className="chat-container bg-body-tertiary border rounded-3 ms-3" >
                         <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
                     </div>
                 </div>

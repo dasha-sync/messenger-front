@@ -12,7 +12,11 @@
 }
 
 .chats-container {
-    min-width: 30%;
+    width: 30%;
+}
+
+.chat-container {
+    width: 80%;
 }
 
 .username {
@@ -22,4 +26,34 @@
 .btn-outline-light {
     border-color: #646cff;
     color: #646cff;
+}
+
+@media (max-width: 1620px) {
+    .chats-container {
+        width: 35%;
+    }
+
+    .chat-container {
+        width: 65%;
+    }
+}
+
+@media (max-width: 1395px) {
+    .chats-container {
+        width: 40%;
+    }
+
+    .chat-container {
+        width: 60%;
+    }
+}
+
+@media (max-width: 1225px) {
+    .chats-container {
+        width: 45%;
+    }
+
+    .chat-container {
+        width: 55%;
+    }
 }
