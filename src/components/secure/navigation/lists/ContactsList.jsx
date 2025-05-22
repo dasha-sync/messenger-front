@@ -1,29 +1,63 @@
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup, Spinner } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import api from '../../../../api/config';
+import { CONTACTS } from '../../../../api/routes';
 
 const ContactsList = () => {
-    const mockData = {
-        contacts: [
-            { id: 1, name: 'Алиса', email: 'alice@example.com' },
-            { id: 2, name: 'Боб', email: 'bob@example.com' },
-            { id: 3, name: 'Карл', email: 'carl@example.com' },
-        ],
-    };
+    const [contacts, setContacts] = useState([]);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchContacts = async () => {
+            try {
+                const response = await api.get(CONTACTS.LIST, {
+                    username: "",
+                    email: ""
+                });
+                setContacts(response.data);
+            } catch (err) {
+                console.error('Error while fetching users:', err);
+                setError('Error loading data');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchContacts();
+    }, []);
 
     const handleChatClick = (chatId) => {
         console.log("Clicked chat:", chatId);
-        // тут можно сделать переход или открыть чат
+        // here you can navigate or open chat
     };
 
+    if (loading) {
+        return <Spinner animation="border" />;
+    }
+
+    if (error) {
+        return <div className="text-danger">{error}</div>;
+    }
+
+    if (!contacts.data.length) {
+        return <div className="text-info">No contacts</div>;
+    }
+
     return (
-        <ListGroup>
-            {mockData.contacts.map((contact) => (
-                <ListGroup.Item key={contact.id} action
-                    onClick={() => handleChatClick(contact.id)}
-                    className="bg-body-secondary hover-border text-start">
-                    {contact.name} - {contact.email}
-                </ListGroup.Item>
-            ))}
-        </ListGroup>
+        <div className="list-parent">
+            <div className="list">
+                <ListGroup>
+                    {contacts.data.map((contact) => (
+                        <ListGroup.Item key={contact.id} action
+                            onClick={() => handleChatClick(contact.id)}
+                            className="bg-body-secondary hover-border text-start">
+                            {contact.toUsername}
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
+            </div>
+        </div>
     );
 };
 

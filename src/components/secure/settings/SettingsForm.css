@@ -11,7 +11,7 @@
     /* border-secondary color */
 }
 
-/* Убираем белые углы */
+/* Remove white corners */
 .modal-content::before,
 .modal-content::after {
     display: none;

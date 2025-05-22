@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
+import api from '../../../api/config';
+import { REQUESTS } from '../../../api/routes';
 import { Nav, ListGroup } from 'react-bootstrap';
 import ChatsList from './lists/ChatsList'
 import ContactsList from './lists/ContactsList'
@@ -9,6 +11,28 @@ import './ChatsSidebar.css'
 
 const ChatsSidebar = () => {
     const [activeTab, setActiveTab] = useState('chats');
+    const [incomingRequests, setIncomingRequests] = useState([]);
+    const [loadingRequests, setLoadingRequests] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchIncomingRequests = async () => {
+            try {
+                const response = await api.get(REQUESTS.LIST);
+                setIncomingRequests(response.data.data);
+                console.log(response.data.data)
+                setError('Error loading data');
+            } catch (err) {
+                console.error('Error while fetching incoming requests:', err);
+                setError('Error loading data');
+            } finally {
+                setLoadingRequests(false);
+            }
+        };
+
+        fetchIncomingRequests();
+    }, []);
+
 
     const renderContent = () => {
         switch (activeTab) {
@@ -26,7 +50,7 @@ const ChatsSidebar = () => {
                 );
             case 'receivedRequests':
                 return (
-                    <ReceivedRequestsList />
+                    <ReceivedRequestsList incomingRequests={incomingRequests} loading={loadingRequests} error={error} />
                 );
             case 'search':
                 return (
@@ -55,7 +79,12 @@ const ChatsSidebar = () => {
                         <Nav.Link eventKey="sentRequests">Outgoing</Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
-                        <Nav.Link eventKey="receivedRequests">Incoming</Nav.Link>
+                        <Nav.Link eventKey="receivedRequests">
+                            Incoming{' '}
+                            {!loadingRequests && incomingRequests.length > 0 && (
+                                <span className="notification-dot"></span>
+                            )}
+                        </Nav.Link>
                     </Nav.Item>
                     <Nav.Item>
                         <Nav.Link eventKey="search">Search</Nav.Link>

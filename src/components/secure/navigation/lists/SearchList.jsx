@@ -9,7 +9,7 @@ const SearchList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Получение данных при монтировании
+    // Data fetching on mount
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -19,8 +19,8 @@ const SearchList = () => {
                 });
                 setUsers(response.data);
             } catch (err) {
-                console.error('Ошибка при получении пользователей:', err);
-                setError('Ошибка при загрузке данных');
+                console.error('Error while fetching users:', err);
+                setError('Error loading data');
             } finally {
                 setLoading(false);
             }
@@ -45,7 +45,7 @@ const SearchList = () => {
 
     const handleChatClick = (chatId) => {
         console.log("Clicked chat:", chatId);
-        // логика перехода/открытия чата
+        // chat navigation/opening logic
     };
 
     if (loading) {
@@ -54,6 +54,21 @@ const SearchList = () => {
 
     if (error) {
         return <div className="text-danger">{error}</div>;
+    }
+
+    if (!filteredUsers.length) {
+        return (
+            <div className="list-parent">
+                <Form.Control
+                    type="text"
+                    placeholder="Find by username or email"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="mb-3 bg-body-secondary search"
+                />
+                <div className="text-info">Nothing found</div>
+            </div>
+        );
     }
 
     return (

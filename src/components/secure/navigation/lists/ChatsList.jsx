@@ -1,27 +1,56 @@
-import { ListGroup } from 'react-bootstrap';
+import { ListGroup, Spinner } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import api from '../../../../api/config';
+import { CHATS } from '../../../../api/routes';
 
 const ChatsList = () => {
-    const mockData = {
-        chats: [
-            { id: 1, name: 'Чат с Алисой' },
-            { id: 2, name: 'Чат с Бобом' },
-            { id: 3, name: 'Чат с Карлом' },
-        ],
-    };
+    const [chats, setChats] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchChats = async () => {
+            try {
+                const response = await api.get(CHATS.LIST);
+                setChats(response.data);
+            } catch (err) {
+                console.error('Error while fetching users:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchChats();
+    }, []);
 
     const handleChatClick = (chatId) => {
         console.log("Clicked chat:", chatId);
-        // тут можно сделать переход или открыть чат
     };
 
+    if (loading) {
+        return <Spinner animation="border" />;
+    }
+
+    if (!chats.data.chats.length) {
+        return <div className="text-info">No chats.</div>;
+    }
+
+
     return (
-        <ListGroup>
-            {mockData.chats.map((chat) => (
-                <ListGroup.Item key={chat.id} action
-                    onClick={() => handleChatClick(chat.id)}
-                    className="bg-body-secondary hover-border text-start">{chat.name}</ListGroup.Item>
-            ))}
-        </ListGroup>
+        <div className="list-parent">
+            <div className="list">
+                <ListGroup>
+                    {chats.data.chats.map((chat) => (
+                        <ListGroup.Item
+                            key={chat.id}
+                            action
+                            onClick={() => handleChatClick(chat.id)}
+                            className="bg-body-secondary hover-border text-start">
+                            {chat.name}
+                        </ListGroup.Item>
+                    ))}
+                </ListGroup>
+            </div>
+        </div>
     );
 };
 
