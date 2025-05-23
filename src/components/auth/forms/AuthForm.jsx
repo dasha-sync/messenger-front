@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../hooks/useAuth';
+import Alert from '../../controls/Alert';
 
 const AuthForm = ({ mode = 'signin' }) => {
     const navigate = useNavigate();
     const isSignUp = mode === 'signup';
-    const { error, isLoading, handleAuth } = useAuth(isSignUp);
+    const { error, isLoading, handleAuth, clearError } = useAuth(isSignUp);
 
     const [credentials, setCredentials] = useState({
         username: '',
@@ -53,9 +54,11 @@ const AuthForm = ({ mode = 'signin' }) => {
             <Form onSubmit={handleSubmit} className="mx-auto bg-dark text-light p-4 rounded" style={{ maxWidth: '400px' }}>
                 <h2 className="mb-4 text-light centerize-form">{isSignUp ? 'Sign Up' : 'Sign In'}</h2>
                 {error && (
-                    <div className="text-danger mb-3 text-start w-100" style={{ whiteSpace: 'pre-line' }}>
-                        {error}
-                    </div>
+                    <Alert
+                        message={error.message}
+                        status={error.status}
+                        onClose={clearError}
+                    />
                 )}
 
                 {formFields.map(({ name, label, type, required }) => (

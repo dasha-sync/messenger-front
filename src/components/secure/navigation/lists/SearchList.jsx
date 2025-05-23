@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { ListGroup, Form, Spinner } from 'react-bootstrap';
 import api from '../../../../api/config';
 import { USERS } from '../../../../api/routes';
+import { useErrorHandler } from '../../../../hooks/useErrorHandler';
+import Alert from '../../../../components/controls/Alert';
 
 const SearchList = () => {
+    const { error, handleError, clearError } = useErrorHandler();
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
 
     // Data fetching on mount
     useEffect(() => {
@@ -19,8 +21,7 @@ const SearchList = () => {
                 });
                 setUsers(response.data);
             } catch (err) {
-                console.error('Error while fetching users:', err);
-                setError('Error loading data');
+                handleError(err, 'DANGER');
             } finally {
                 setLoading(false);
             }
@@ -52,13 +53,16 @@ const SearchList = () => {
         return <Spinner animation="border" />;
     }
 
-    if (error) {
-        return <div className="text-danger">{error}</div>;
-    }
-
     if (!filteredUsers.length) {
         return (
             <div className="list-parent">
+                {error && (
+                    <Alert
+                        message={error.message}
+                        status={error.status}
+                        onClose={clearError}
+                    />
+                )}
                 <Form.Control
                     type="text"
                     placeholder="Find by username or email"
@@ -73,6 +77,13 @@ const SearchList = () => {
 
     return (
         <div className="list-parent">
+            {error && (
+                <Alert
+                    message={error.message}
+                    status={error.status}
+                    onClose={clearError}
+                />
+            )}
             <Form.Control
                 type="text"
                 placeholder="Find by username or email"

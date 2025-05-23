@@ -101,8 +101,8 @@ button:focus-visible {
 .btn-outline-warning {
   --bs-btn-color: #a4a8ff;
   --bs-btn-border-color: #a4a8ff;
-  --bs-btn-hover-color: #a4a8ff;
-  --bs-btn-hover-bg: transparent;
+  --bs-btn-hover-color: #000;
+  --bs-btn-hover-bg: #a4a8ff;
   --bs-btn-active-color: #a4a8ff;
   --bs-btn-active-bg: transparent;
   --bs-btn-active-border-color: #a4a8ff;
@@ -110,5 +110,20 @@ button:focus-visible {
   --bs-btn-disabled-color: #a4a8ff;
   --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: #a4a8ff;
+  --bs-gradient: none;
+}
+
+.btn-outline-danger {
+  --bs-btn-color: #da213a;
+  --bs-btn-border-color: #da213a;
+  --bs-btn-hover-color: #343a40;
+  --bs-btn-hover-bg: #da213a;
+  --bs-btn-hover-border-color: #da213a;
+  --bs-btn-active-color: #da213a;
+  --bs-btn-active-bg: transparent;
+  --bs-btn-active-border-color: #da213a;
+  --bs-btn-disabled-color: #da213a;
+  --bs-btn-disabled-bg: transparent;
+  --bs-btn-disabled-border-color: #da213a;
   --bs-gradient: none;
 }

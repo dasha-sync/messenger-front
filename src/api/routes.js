@@ -43,9 +43,9 @@ export const MESSAGES = {
 // Пользователи
 export const USERS = {
     LIST: BASE.USERS,
+    DELETE: `${BASE.USERS}/destroy`,
     GET_BY_ID: (userId) => replaceParams(`${BASE.USERS}/{userId}`, { userId }),
     UPDATE: (userId) => replaceParams(`${BASE.USERS}/{userId}/update`, { userId }),
-    DELETE: (userId) => replaceParams(`${BASE.USERS}/{userId}/destroy`, { userId }),
 };
 
 // Запросы

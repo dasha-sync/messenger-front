@@ -1,0 +1,21 @@
+.trash {
+    font-size: medium;
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    justify-content: space-between;
+    min-width: 250px;
+    max-width: 50%;
+    padding-right: 60px;
+    /* space for close button */
+}

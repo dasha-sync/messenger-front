@@ -10,9 +10,23 @@
 }
 
 .centerize {
-    margin-top: 130%;
+    margin-top: 100%;
 }
 
 .centerize-form {
     margin-top: 70%;
+}
+
+.info {
+    color: #a4a8ff;
+}
+
+.info a {
+    text-decoration: underline;
+    color: #646cff;
+}
+
+.info a:hover {
+    text-decoration: underline;
+    color: #a4a8ff;
 }
