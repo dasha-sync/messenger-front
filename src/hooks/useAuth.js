@@ -3,15 +3,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/config';
 import { AUTH } from '../api/routes';
+import { useErrorHandler } from './useErrorHandler';
 
 export const useAuth = (isSignUp = false) => {
     const navigate = useNavigate();
-    const [error, setError] = useState('');
+    const { error, handleError, clearError } = useErrorHandler();
     const [isLoading, setIsLoading] = useState(false);
 
     const handleAuth = async (credentials) => {
         setIsLoading(true);
-        setError('');
+        clearError();
 
         try {
             if (isSignUp) {
@@ -35,32 +36,16 @@ export const useAuth = (isSignUp = false) => {
                 throw new Error('Invalid signin response');
             }
         } catch (err) {
-            handleError(err);
+            handleError(err, 'DANGER');
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleError = (err) => {
-        if (err.code === 'ECONNABORTED') {
-            setError('Connection timeout. Please try again.');
-        } else if (err.response?.data?.errors) {
-            const errors = err.response.data.errors;
-            const errorMessages = Object.entries(errors)
-                .map(([key, value]) => value)
-                .filter(Boolean)
-                .join('\n');
-            setError(errorMessages);
-        } else if (err.request) {
-            setError('No response from server. Please check your connection.');
-        } else {
-            setError(err.message || 'An error occurred. Please try again.');
         }
     };
 
     return {
         error,
         isLoading,
-        handleAuth
+        handleAuth,
+        clearError
     };
 };

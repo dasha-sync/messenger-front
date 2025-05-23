@@ -2,9 +2,12 @@ import { ListGroup, Spinner } from 'react-bootstrap';
 import api from '../../../../api/config';
 import { REQUESTS } from '../../../../api/routes';
 import { useState } from 'react';
+import { useErrorHandler } from '../../../../hooks/useErrorHandler';
+import Alert from '../../../../components/controls/Alert';
 
 const ReceivedRequestsList = ({ incomingRequests, loading }) => {
-    const [error, setError] = useState(null);
+    const { error, handleError, clearError } = useErrorHandler();
+    const [requests, setRequests] = useState(incomingRequests);
 
     if (loading) {
         return <Spinner animation="border" />;
@@ -16,43 +19,42 @@ const ReceivedRequestsList = ({ incomingRequests, loading }) => {
 
     const handleApproveClick = async (reqId) => {
         try {
+            // eslint-disable-next-line no-unused-vars
             const response = await api.post(REQUESTS.APPROVE(reqId));
-            console.log(response.data)
+            setRequests(prevRequests => prevRequests.filter(request => request.id !== reqId));
         } catch (err) {
-            console.error('Error while fetching outgoing requests:', err);
-            setError('Error loading data');
+            handleError(err, 'DANGER');
         }
-    }
-
-    if (error) {
-        return <div className="text-danger">{error}</div>;
     }
 
     const handleRejectClick = async (reqId) => {
         try {
+            // eslint-disable-next-line no-unused-vars
             const response = await api.post(REQUESTS.REJECT(reqId));
-            console.log(response.data)
+            setRequests(prevRequests => prevRequests.filter(request => request.id !== reqId));
         } catch (err) {
-            console.error('Error while fetching outgoing requests:', err);
-            setError('Error loading data');
+            handleError(err, 'DANGER');
         }
-    }
-
-    if (error) {
-        return <div className="text-danger">{error}</div>;
     }
 
     return (
         <div className="list-parent">
+            {error && (
+                <Alert
+                    message={error.message}
+                    status={error.status}
+                    onClose={clearError}
+                />
+            )}
             <div className="list">
                 <ListGroup>
-                    {incomingRequests.map((req) => (
+                    {requests.map((req) => (
                         <ListGroup.Item key={req.id} className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 <div>{req.fromUsername}</div>
                                 <div className="btn-group btn-group-sm" role="group">
-                                    <button type="button" className="btn btn-outline-warning" onClick={() => handleApproveClick(req.id)}>Approve</button>
-                                    <button type="button" className="btn btn-outline-info" onClick={() => handleRejectClick(req.id)}>Reject</button>
+                                    <button type="button" className="btn btn-request btn-outline-warning" onClick={() => handleApproveClick(req.id)}>Approve</button>
+                                    <button type="button" className="btn btn-request btn-outline-info" onClick={() => handleRejectClick(req.id)}>Reject</button>
                                 </div>
                             </div>
                         </ListGroup.Item>

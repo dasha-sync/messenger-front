@@ -22,6 +22,9 @@ const SecurePage = () => {
                     <button type="button" size="lg" className="btn btn-outline-warning">
                         {localStorage.getItem("username")}
                     </button>
+                    <p className="info my-auto mx-3 mb-2">
+                        <a href="http://localhost:8080/swagger-ui.html">API documentation</a>
+                    </p>
                 </div>
                 <div className="d-flex my-auto mx-3 mb-3">
                     <button type="button" size="lg" className="btn btn-outline-primary mx-3" onClick={() => navigate('/settings')}>

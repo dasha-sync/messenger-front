@@ -8,23 +8,22 @@ import SentRequestList from './lists/SentRequestList'
 import ReceivedRequestsList from './lists/ReceivedRequestsList'
 import SearchList from './lists/SearchList'
 import './ChatsSidebar.css'
+import { useErrorHandler } from '../../../hooks/useErrorHandler';
+import Alert from '../../../components/controls/Alert';
 
 const ChatsSidebar = () => {
     const [activeTab, setActiveTab] = useState('chats');
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [loadingRequests, setLoadingRequests] = useState(true);
-    const [error, setError] = useState(null);
+    const { error, handleError, clearError } = useErrorHandler();
 
     useEffect(() => {
         const fetchIncomingRequests = async () => {
             try {
                 const response = await api.get(REQUESTS.LIST);
                 setIncomingRequests(response.data.data);
-                console.log(response.data.data)
-                setError('Error loading data');
             } catch (err) {
-                console.error('Error while fetching incoming requests:', err);
-                setError('Error loading data');
+                handleError(err, 'DANGER');
             } finally {
                 setLoadingRequests(false);
             }
@@ -63,6 +62,13 @@ const ChatsSidebar = () => {
 
     return (
         <div className="chats-container bg-body-tertiary border rounded-3 p-2">
+            {error && (
+                <Alert
+                    message={error.message}
+                    status={error.status}
+                    onClose={clearError}
+                />
+            )}
             <div className="horizontal-scroll">
                 <Nav
                     variant="tabs"

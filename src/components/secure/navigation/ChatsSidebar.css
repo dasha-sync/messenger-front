@@ -44,7 +44,6 @@
 .horizontal-scroll {
     overflow-x: auto;
     white-space: nowrap;
-    height: 5%;
 }
 
 @media (max-width: 1620px) {
@@ -61,11 +60,17 @@
     height: 8px;
     margin-left: 6px;
     margin-bottom: 8px;
-    background-color: rgb(206, 0, 27);
+    background-color: #da213a;
+    border-color: #da213a;
     border-radius: 50%;
 }
 
 .incoming-request {
     display: flex;
 
+}
+
+.btn-request {
+    padding-bottom: 0;
+    padding-top: 0;
 }

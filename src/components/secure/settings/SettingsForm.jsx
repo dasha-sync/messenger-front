@@ -4,19 +4,22 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../../api/config';
 import { AUTH, USERS } from '../../../api/routes';
 import './SettingsForm.css';
+import Alert from './../../controls/Alert'
+import { useErrorHandler } from './../../../hooks/useErrorHandler';
 
 
 const SettingsForm = () => {
     const navigate = useNavigate();
+    const { error, handleError, clearError } = useErrorHandler();
     const [credentials, setCredentials] = useState({
         username: '',
         email: '',
         newPassword: '',
         currentPassword: ''
     });
-    const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [deleteFlag, setDeleteFlag] = useState(false);
 
     // Load initial values from localStorage
     useEffect(() => {
@@ -46,7 +49,6 @@ const SettingsForm = () => {
 
     const handlePasswordSubmit = async () => {
         setIsLoading(true);
-        setError('');
 
         try {
             const finalCredentials = {
@@ -59,45 +61,45 @@ const SettingsForm = () => {
                 password: credentials.currentPassword
             });
 
+            console.log(deleteFlag);
+
             if (authResponse.data?.data?.token && authResponse.data?.data?.user?.id) {
-                const userId = authResponse.data.data.user.id;
+                if (!deleteFlag) {
+                    const userId = authResponse.data.data.user.id;
 
-                try {
-                    const updateResponse = await api.patch(USERS.UPDATE(userId), finalCredentials);
+                    try {
+                        const updateResponse = await api.patch(USERS.UPDATE(userId), finalCredentials);
 
-                    if (updateResponse.data?.data?.token) {
-                        console.log(updateResponse.data.data.token)
-                        localStorage.setItem('token', updateResponse.data.data.token);
-                        localStorage.setItem('username', updateResponse.data.data.user.username);
-                        localStorage.setItem('email', updateResponse.data.data.user.email);
-                        navigate('/settings');
+                        if (updateResponse.data?.data?.token) {
+                            console.log(updateResponse.data.data.token)
+                            localStorage.setItem('token', updateResponse.data.data.token);
+                            localStorage.setItem('username', updateResponse.data.data.user.username);
+                            localStorage.setItem('email', updateResponse.data.data.user.email);
+                            navigate('/settings');
+                        }
+                    } catch (updateError) {
+                        handleError(updateError)
                     }
-                } catch (updateError) {
-                    handleError(updateError)
+                } else {
+                    try {
+                        console.log({ password: finalCredentials.currentPassword })
+                        const deleteResponse = await api.delete(USERS.DELETE, { data: { password: finalCredentials.currentPassword } });
+                        console.log(deleteResponse)
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("email");
+                        navigate('/');
+                    } catch (updateError) {
+                        handleError(updateError)
+                    }
                 }
             }
         } catch (err) {
             handleError(err)
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleError = (err) => {
-        if (err.code === 'ECONNABORTED') {
-            setError('Connection timeout. Please try again.');
-        } else if (err.response?.data?.errors) {
-            const errors = err.response.data.errors;
-            const errorMessages = Object.entries(errors)
-                // eslint-disable-next-line no-unused-vars
-                .map(([key, value]) => value)
-                .filter(Boolean)
-                .join('\n');
-            setError(errorMessages);
-        } else if (err.request) {
-            setError('No response from server. Please check your connection.');
-        } else {
-            setError(err.message || 'An error occurred. Please try again.');
+            setShowPasswordModal(false);
+            setCredentials(prev => ({ ...prev, currentPassword: '' }));
         }
     };
 
@@ -106,7 +108,13 @@ const SettingsForm = () => {
             <Container>
                 <Form onSubmit={handleSubmit} className="mx-auto bg-dark text-light p-4 rounded" style={{ maxWidth: '400px' }}>
                     <h2 className="mb-4 text-light centerize-form">Update Profile</h2>
-                    {error && <div className="text-danger mb-3 text-start w-100" style={{ whiteSpace: 'pre-line' }}>{error}</div>}
+                    {error && (
+                        <Alert
+                            message={error.message}
+                            status={error.status}
+                            onClose={clearError}
+                        />
+                    )}
 
                     <Form.Group className="mb-3">
                         <Form.Label className="text-light text-start w-100">Username</Form.Label>
@@ -158,6 +166,22 @@ const SettingsForm = () => {
                                 </>
                             ) : (
                                 'Update Profile'
+                            )}
+                        </Button>
+                        <Button variant="danger"
+                            type="button"
+                            disabled={isLoading}
+                            onClick={() => {
+                                setDeleteFlag(true);
+                                setShowPasswordModal(true);
+                            }}>
+                            {isLoading ? (
+                                <>
+                                    <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" className="me-2" />
+                                    Deleting...
+                                </>
+                            ) : (
+                                'Delete Prifile'
                             )}
                         </Button>
                     </div>

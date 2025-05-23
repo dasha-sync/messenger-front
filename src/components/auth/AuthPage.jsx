@@ -19,6 +19,17 @@ const AuthPage = () => {
                         Sign in
                     </Button>
                 </div>
+                <br />
+                <p className="info">
+                    <a href="http://localhost:8080/swagger-ui.html">API documentation</a>
+                    <br />
+                    Github:&nbsp;
+                    <a href="https://github.com/dasha-sync/messenger-front">Fronend</a> |&nbsp;
+                    <a href="https://github.com/dasha-sync/messenger-bakend">Backend</a> |&nbsp;
+                    <a href="https://github.com/dasha-sync/messenger-infra">Infrastructure</a>
+                    <br />
+                    Authored by Daria Kapur
+                </p>
             </Container>
         </div>
     );
