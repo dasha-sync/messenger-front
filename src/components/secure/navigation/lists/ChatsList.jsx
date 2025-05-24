@@ -6,7 +6,7 @@ import DeleteButton from './../../../controls/DeleteButton'
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import Alert from '../../../../components/controls/Alert';
 
-const ChatsList = () => {
+const ChatsList = ({ onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ const ChatsList = () => {
     }, []);
 
     const handleChatClick = (chatId) => {
-        console.log("Clicked chat:", chatId);
+        onDisplaySelect(chatId, true);
     };
 
     if (loading) {
@@ -81,6 +81,5 @@ const ChatsList = () => {
         </div>
     );
 };
-
 
 export default ChatsList;
