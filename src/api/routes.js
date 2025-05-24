@@ -45,7 +45,8 @@ export const USERS = {
     LIST: BASE.USERS,
     DELETE: `${BASE.USERS}/destroy`,
     GET_BY_ID: (userId) => replaceParams(`${BASE.USERS}/{userId}`, { userId }),
-    UPDATE: (userId) => replaceParams(`${BASE.USERS}/{userId}/update`, { userId }),
+    UPDATE: `${BASE.USERS}/update`,
+    RELATIONS: (userId) => replaceParams(`${BASE.USERS}/{userId}/relations`, { userId }),
 };
 
 // Запросы

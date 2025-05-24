@@ -28,7 +28,7 @@ const SearchList = ({ onDisplaySelect }) => {
         };
 
         fetchUsers();
-    }, []);
+    }, [handleError]);
 
 
     const lowerSearch = searchTerm.toLowerCase();
@@ -97,8 +97,8 @@ const SearchList = ({ onDisplaySelect }) => {
                             key={user.id}
                             action
                             onClick={() => handleUserClick(user.id)}
-                            className="bg-body-secondary hover-border text-start">
-                            {user.username} - {user.email}
+                            className="bg-body-secondary hover-border text-start d-flex align-items-end justify-content-between">
+                            <b>{user.username}</b><div className="text-muted small">{user.email}</div>
                         </ListGroup.Item>
                     ))}
                 </ListGroup>

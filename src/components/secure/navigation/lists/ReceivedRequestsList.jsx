@@ -61,8 +61,8 @@ const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) =>
                             <div className="d-flex justify-content-between">
                                 <div>{req.fromUsername}</div>
                                 <div className="btn-group btn-group-sm" role="group">
-                                    <button type="button" className="btn btn-request btn-outline-warning" onClick={() => handleApproveClick(req.id)}>Approve</button>
-                                    <button type="button" className="btn btn-request btn-outline-info" onClick={() => handleRejectClick(req.id)}>Reject</button>
+                                    <a type="button" className="btn btn-request btn-outline-warning" onClick={() => handleApproveClick(req.id)}>Approve</a>
+                                    <a type="button" className="btn btn-request btn-outline-info" onClick={() => handleRejectClick(req.id)}>Reject</a>
                                 </div>
                             </div>
                         </ListGroup.Item>

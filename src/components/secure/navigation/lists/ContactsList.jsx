@@ -27,7 +27,7 @@ const ContactsList = ({ onDisplaySelect }) => {
         };
 
         fetchContacts();
-    }, []);
+    }, [handleError]);
 
     const handleUserClick = (userId) => {
         onDisplaySelect(userId, false);

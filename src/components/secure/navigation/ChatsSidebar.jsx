@@ -30,7 +30,7 @@ const ChatsSidebar = ({ onDisplaySelect }) => {
         };
 
         fetchIncomingRequests();
-    }, []);
+    }, [handleError]);
 
 
     const renderContent = () => {
