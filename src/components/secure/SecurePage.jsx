@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -10,16 +10,33 @@ import './SecurePage.css';
 
 const SecurePage = () => {
     const navigate = useNavigate();
-    const [selectedId, setSelectedId] = useState(null);
-    const [isChat, setIsChat] = useState(null);
+    const [selectedId, setSelectedId] = useState(() => {
+        const savedId = localStorage.getItem('selectedId');
+        return savedId ? JSON.parse(savedId) : null;
+    });
+    const [isChat, setIsChat] = useState(() => {
+        const savedIsChat = localStorage.getItem('isChat');
+        return savedIsChat ? JSON.parse(savedIsChat) : null;
+    });
+
+    useEffect(() => {
+        if (selectedId !== null) {
+            localStorage.setItem('selectedId', JSON.stringify(selectedId));
+        }
+        if (isChat !== null) {
+            localStorage.setItem('isChat', JSON.stringify(isChat));
+        }
+    }, [selectedId, isChat]);
 
     function setDisplay(id, flag) {
-        setSelectedId(id)
-        setIsChat(flag)
+        setSelectedId(id);
+        setIsChat(flag);
     }
 
     const handleLogout = () => {
         localStorage.removeItem('token');
+        localStorage.removeItem('selectedId');
+        localStorage.removeItem('isChat');
         window.dispatchEvent(new Event('authChange'));
         navigate('/welcome');
     };
@@ -31,7 +48,7 @@ const SecurePage = () => {
                     <button type="button" size="lg" className="btn btn-outline-warning">
                         {localStorage.getItem("username")}
                     </button>
-                    <p className="info my-auto mx-3 mb-2">
+                    <p className="info my-auto mx-3 mb-2 text-muted small">
                         <a href="http://localhost:8080/swagger-ui.html">API documentation</a>
                     </p>
                 </div>
@@ -50,7 +67,7 @@ const SecurePage = () => {
                     {isChat ? (
                         <ChatDisplay chatId={selectedId} />
                     ) : (
-                        <UserDisplay userId={selectedId} />
+                        <UserDisplay userId={selectedId} onDisplaySelect={setDisplay} />
                     )}
                 </div>
             </div>

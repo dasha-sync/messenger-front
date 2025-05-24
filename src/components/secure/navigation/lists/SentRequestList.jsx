@@ -24,7 +24,7 @@ const SentRequestList = ({ onDisplaySelect }) => {
         };
 
         fetchOutgoingRequests();
-    }, []);
+    }, [handleError]);
 
     const handleUserClick = (userId) => {
         onDisplaySelect(userId, false)
@@ -63,8 +63,10 @@ const SentRequestList = ({ onDisplaySelect }) => {
             <div className="list">
                 <ListGroup>
                     {outgoingRequests.data.map((req) => (
-                        <ListGroup.Item key={req.id} action
-                            onClick={() => handleUserClick(req.id)}
+                        <ListGroup.Item
+                            key={req.id}
+                            action
+                            onClick={() => handleUserClick(req.to)}
                             className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {req.toUsername}

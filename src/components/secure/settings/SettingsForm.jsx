@@ -65,10 +65,8 @@ const SettingsForm = () => {
 
             if (authResponse.data?.data?.token && authResponse.data?.data?.user?.id) {
                 if (!deleteFlag) {
-                    const userId = authResponse.data.data.user.id;
-
                     try {
-                        const updateResponse = await api.patch(USERS.UPDATE(userId), finalCredentials);
+                        const updateResponse = await api.patch(USERS.UPDATE, finalCredentials);
 
                         if (updateResponse.data?.data?.token) {
                             console.log(updateResponse.data.data.token)

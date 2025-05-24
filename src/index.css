@@ -127,3 +127,7 @@ button:focus-visible {
   --bs-btn-disabled-border-color: #da213a;
   --bs-gradient: none;
 }
+
+.spinner-border {
+  border: var(--bs-spinner-border-width) 0.25em solid #a4a8ff;
+}
