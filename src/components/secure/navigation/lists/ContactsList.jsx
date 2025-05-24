@@ -41,7 +41,7 @@ const ContactsList = ({ onDisplaySelect }) => {
         return <div className="text-info">No contacts</div>;
     }
 
-    const handleDeleteClick = async (contactId) => {
+    /*const handleDeleteClick = async (contactId) => {
         try {
             // eslint-disable-next-line no-unused-vars
             const response = await api.delete(CONTACTS.DELETE(contactId));
@@ -52,7 +52,7 @@ const ContactsList = ({ onDisplaySelect }) => {
         } catch (err) {
             handleError(err, 'DANGER');
         }
-    };
+    };*/
 
     return (
         <div className="list-parent">
@@ -73,7 +73,6 @@ const ContactsList = ({ onDisplaySelect }) => {
                             className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {contact.toUsername}
-                                <DeleteButton onClick={() => handleDeleteClick(contact.id)} />
                             </div>
                         </ListGroup.Item>
                     ))}
