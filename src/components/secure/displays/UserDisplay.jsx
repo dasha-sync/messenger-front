@@ -79,18 +79,34 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
         } catch (err) {
             handleError(err, 'DANGER');
         }
-    }
-
-    const sendContactRequest = () => {
 
     }
 
-    const approove = () => {
-
+    const sendContactRequest = async () => {
+        try {
+            const response = await api.post(REQUESTS.CREATE(user.id))
+            handleError(response, 'SUCCESS')
+        } catch (err) {
+            handleError(err, 'DANGER');
+        }
     }
 
-    const reject = () => {
+    const approve = async () => {
+        try {
+            const response = await api.post(REQUESTS.APPROVE(relations.hasIncomingRequest))
+            handleError(response, 'SUCCESS')
+        } catch (err) {
+            handleError(err, 'DANGER');
+        }
+    }
 
+    const reject = async () => {
+        try {
+            const response = await api.post(REQUESTS.REJECT(relations.hasIncomingRequest))
+            handleError(response, 'SUCCESS')
+        } catch (err) {
+            handleError(err, 'DANGER');
+        }
     }
 
     return (
@@ -105,9 +121,9 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
 
             {user ? (
                 <div className="user-profile">
-                    <div className="mb-4">
-                        <div className="card bg-light-subtle">
-                            <div className="card-body d-flex user-card">
+                    <div className="mb-4 card bg-light-subtle">
+                        <div className="card-body ">
+                            <div className="d-flex user-card">
                                 <div className="card-text">
                                     <label className="text-muted small">Username</label>
                                     <div className="fw-bold">{user.username}</div>
@@ -117,41 +133,53 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
                                     <div className="fw-bold">{user.email}</div>
                                 </div>
                             </div>
-                            <div className="d-flex">
+                            <div className="d-flex flex-column user-actions">
                                 {relations.hasChat ? (
                                     <div>
-                                        <button type="button" size="lg" className="btn btn-outline-secondary" onClick={goToDialog}>
-                                            Go to dialog
-                                        </button>
-                                        <button type="button" size="lg" className="btn btn-outline-secondary" onClick={deleteDialog}>
-                                            Delete dialog
+                                        <button type="button" size="lg" className="btn btn-outline-light mb-3" onClick={goToDialog}>
+                                            Go to chat
                                         </button>
                                     </div>
                                 ) : (
-                                    <button type="button" size="lg" className="btn btn-outline-secondary" onClick={startDialog}>
-                                        Start dialog
-                                    </button>
+                                    <div>
+                                        <button type="button" size="lg" className="btn btn-outline-secondary mb-3" onClick={startDialog}>
+                                            Start chatting
+                                        </button>
+                                    </div>
                                 )}
                                 {relations.hasContact ? (
-                                    <button type="button" size="lg" className="btn btn-outline-secondary" onClick={deleteContact}>
-                                        Delete contact
-                                    </button>
-                                )
-                                    : relations.hasOutgoingRequest ? (
-                                        <button type="button" size="lg" className="btn btn-outline-secondary" onClick={deleteOutgoingRequest}>
+                                    <div>
+                                        <button type="button" size="lg" className="btn btn-outline-danger mb-3" onClick={deleteContact}>
+                                            Delete contact
+                                        </button>
+                                    </div>
+                                ) : relations.hasOutgoingRequest ? (
+                                    <div>
+                                        <button type="button" size="lg" className="btn btn-outline-secondary btn-outline-danger mb-3" onClick={deleteOutgoingRequest}>
                                             Delete outgoing request
                                         </button>
-                                    ) : (
-                                        <button type="button" size="lg" className="btn btn-outline-secondary" onClick={sendContactRequest}>
-                                            Send contact request
-                                        </button>
-                                    )}
-                                {relations.hasIncomingRequest ? (
-                                    <div className="btn-group btn-group-sm" role="group">
-                                        <button type="button" className="btn btn-request btn-outline-warning" onClick={approove}>Approve</button>
+                                    </div>
+                                ) : relations.hasIncomingRequest ? (
+                                    <div className="btn-group btn-group mb-3" role="group">
+                                        <button type="button" className="btn btn-request btn-outline-warning" onClick={approve}>Approve</button>
                                         <button type="button" className="btn btn-request btn-outline-info" onClick={reject}>Reject</button>
                                     </div>
-                                ) : (<div></div>)}
+                                ) : (
+                                    <div>
+                                        <button type="button" size="lg" className="btn btn-outline-info" onClick={sendContactRequest}>
+                                            Send contact request
+                                        </button>
+                                    </div>
+                                )}
+                                {relations.hasChat ? (
+                                    <div>
+                                        <button type="button" size="lg" className="btn btn-outline-danger mb-3" onClick={deleteDialog}>
+                                            Delete chat
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div></div>
+                                )}
                             </div>
                         </div>
                     </div>
