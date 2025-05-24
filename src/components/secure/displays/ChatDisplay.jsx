@@ -51,7 +51,7 @@ const ChatDisplay = ({ chatId }) => {
 
         try {
             const response = await api.post(MESSAGES.CREATE(chatId), {
-                content: newMessage
+                text: newMessage
             });
             setMessages(prev => [...prev, response.data.data]);
             setNewMessage('');
