@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import Alert from '../../../../components/controls/Alert';
 
-const ReceivedRequestsList = ({ incomingRequests, loading }) => {
+const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [requests, setRequests] = useState(incomingRequests);
 
@@ -37,6 +37,10 @@ const ReceivedRequestsList = ({ incomingRequests, loading }) => {
         }
     }
 
+    const handleUserClick = (userId) => {
+        onDisplaySelect(userId, false)
+    }
+
     return (
         <div className="list-parent">
             {error && (
@@ -49,7 +53,11 @@ const ReceivedRequestsList = ({ incomingRequests, loading }) => {
             <div className="list">
                 <ListGroup>
                     {requests.map((req) => (
-                        <ListGroup.Item key={req.id} className="bg-body-secondary hover-border text-start">
+                        <ListGroup.Item
+                            key={req.id}
+                            action
+                            onClick={() => handleUserClick(req.from)}
+                            className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 <div>{req.fromUsername}</div>
                                 <div className="btn-group btn-group-sm" role="group">

@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Container, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ChatsSidebar from './navigation/ChatsSidebar'
+import ChatDisplay from './displays/ChatDisplay'
+import UserDisplay from './displays/UserDisplay'
 import '../auth/AuthPage.css';
 import './SecurePage.css';
 
 const SecurePage = () => {
     const navigate = useNavigate();
+    const [selectedId, setSelectedId] = useState(null);
+    const [isChat, setIsChat] = useState(null);
+
+    function setDisplay(id, flag) {
+        setSelectedId(id)
+        setIsChat(flag)
+    }
 
     const handleLogout = () => {
         localStorage.removeItem('token');
@@ -37,10 +46,12 @@ const SecurePage = () => {
             </div>
             <div className="flex-grow-1 d-flex px-3">
                 <div className="d-flex w-100">
-                    <ChatsSidebar />
-                    <div className="chat-container bg-body-tertiary border rounded-3 ms-3" >
-                        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-                    </div>
+                    <ChatsSidebar onDisplaySelect={setDisplay} />
+                    {isChat ? (
+                        <ChatDisplay chatId={selectedId} />
+                    ) : (
+                        <UserDisplay userId={selectedId} />
+                    )}
                 </div>
             </div>
         </div>
