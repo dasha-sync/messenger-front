@@ -4,6 +4,8 @@ export const useErrorHandler = () => {
     const [error, setError] = useState(null);
 
     const handleError = useCallback((err, customStatus = null) => {
+        console.log(err?.response?.data?.message); // безопасный лог
+
         if (err.code === 'ECONNABORTED') {
             setError({
                 message: 'Connection timeout. Please try again.',
@@ -11,18 +13,36 @@ export const useErrorHandler = () => {
             });
         } else if (err.response?.data?.errors) {
             const errors = err.response.data.errors;
-            const errorMessages = Object.entries(errors)
-                // eslint-disable-next-line no-unused-vars
-                .map(([key, value]) => value)
+            const errorMessages = Object.values(errors)
                 .filter(Boolean)
                 .join('\n');
             setError({
                 message: errorMessages,
                 status: customStatus || 'DANGER'
             });
-        } else if (err.response?.data?.message || err.response?.message) {
+        } else if (err.response?.data?.message) {
             setError({
-                message: err.response.data?.message || err.response.message,
+                message: err.response.data.message,
+                status: customStatus || 'DANGER'
+            });
+        } else if (err.data?.action === "DELETE") {
+            setError({
+                message: 'Successfully deleted',
+                status: customStatus || 'DANGER'
+            });
+        } else if (err.data?.action === "UPDATE") {
+            setError({
+                message: 'Successfully updated',
+                status: customStatus || 'DANGER'
+            });
+        } else if (err.data?.message) {
+            setError({
+                message: err.data.message,
+                status: customStatus || 'DANGER'
+            });
+        } else if (err.data?.data?.message) {
+            setError({
+                message: err.data.data.message,
                 status: customStatus || 'DANGER'
             });
         } else if (err.request) {
@@ -37,6 +57,7 @@ export const useErrorHandler = () => {
             });
         }
     }, []);
+
 
     const clearError = useCallback(() => {
         setError(null);

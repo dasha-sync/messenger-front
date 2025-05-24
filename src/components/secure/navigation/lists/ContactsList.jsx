@@ -6,7 +6,7 @@ import DeleteButton from './../../../controls/DeleteButton'
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import Alert from '../../../../components/controls/Alert';
 
-const ContactsList = () => {
+const ContactsList = ({ onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,11 +27,10 @@ const ContactsList = () => {
         };
 
         fetchContacts();
-    }, []);
+    }, [handleError]);
 
-    const handleChatClick = (chatId) => {
-        console.log("Clicked chat:", chatId);
-        // here you can navigate or open chat
+    const handleUserClick = (userId) => {
+        onDisplaySelect(userId, false);
     };
 
     if (loading) {
@@ -42,7 +41,7 @@ const ContactsList = () => {
         return <div className="text-info">No contacts</div>;
     }
 
-    const handleDeleteClick = async (contactId) => {
+    /*const handleDeleteClick = async (contactId) => {
         try {
             // eslint-disable-next-line no-unused-vars
             const response = await api.delete(CONTACTS.DELETE(contactId));
@@ -53,7 +52,7 @@ const ContactsList = () => {
         } catch (err) {
             handleError(err, 'DANGER');
         }
-    };
+    };*/
 
     return (
         <div className="list-parent">
@@ -67,12 +66,13 @@ const ContactsList = () => {
             <div className="list">
                 <ListGroup>
                     {contacts.data.map((contact) => (
-                        <ListGroup.Item key={contact.id} action
-                            onClick={() => handleChatClick(contact.id)}
+                        <ListGroup.Item
+                            key={contact.id}
+                            action
+                            onClick={() => handleUserClick(contact.to)}
                             className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {contact.toUsername}
-                                <DeleteButton onClick={() => handleDeleteClick(contact.id)} />
                             </div>
                         </ListGroup.Item>
                     ))}

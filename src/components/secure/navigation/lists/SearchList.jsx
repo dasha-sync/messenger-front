@@ -5,7 +5,7 @@ import { USERS } from '../../../../api/routes';
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import Alert from '../../../../components/controls/Alert';
 
-const SearchList = () => {
+const SearchList = ({ onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [users, setUsers] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
@@ -28,7 +28,7 @@ const SearchList = () => {
         };
 
         fetchUsers();
-    }, []);
+    }, [handleError]);
 
 
     const lowerSearch = searchTerm.toLowerCase();
@@ -44,9 +44,8 @@ const SearchList = () => {
 
     const filteredUsers = [...usersByUsername, ...usersByEmail];
 
-    const handleChatClick = (chatId) => {
-        console.log("Clicked chat:", chatId);
-        // chat navigation/opening logic
+    const handleUserClick = (userId) => {
+        onDisplaySelect(userId, false)
     };
 
     if (loading) {
@@ -97,9 +96,9 @@ const SearchList = () => {
                         <ListGroup.Item
                             key={user.id}
                             action
-                            onClick={() => handleChatClick(user.id)}
-                            className="bg-body-secondary hover-border text-start">
-                            {user.username} - {user.email}
+                            onClick={() => handleUserClick(user.id)}
+                            className="bg-body-secondary hover-border text-start d-flex align-items-end justify-content-between">
+                            <b>{user.username}</b><div className="text-muted small">{user.email}</div>
                         </ListGroup.Item>
                     ))}
                 </ListGroup>

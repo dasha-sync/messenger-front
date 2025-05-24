@@ -20,7 +20,7 @@ const AuthPage = () => {
                     </Button>
                 </div>
                 <br />
-                <p className="info">
+                <p className="info text-muted small">
                     <a href="http://localhost:8080/swagger-ui.html">API documentation</a>
                     <br />
                     Github:&nbsp;

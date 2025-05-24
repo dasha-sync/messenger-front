@@ -6,7 +6,7 @@ import DeleteButton from './../../../controls/DeleteButton'
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import Alert from '../../../../components/controls/Alert';
 
-const SentRequestList = () => {
+const SentRequestList = ({ onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [outgoingRequests, setOutgoingRequests] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -24,10 +24,10 @@ const SentRequestList = () => {
         };
 
         fetchOutgoingRequests();
-    }, []);
+    }, [handleError]);
 
-    const handleChatClick = (chatId) => {
-        console.log("Clicked chat:", chatId);
+    const handleUserClick = (userId) => {
+        onDisplaySelect(userId, false)
     };
 
     if (loading) {
@@ -63,12 +63,14 @@ const SentRequestList = () => {
             <div className="list">
                 <ListGroup>
                     {outgoingRequests.data.map((req) => (
-                        <ListGroup.Item key={req.id} action
-                            onClick={() => handleChatClick(req.id)}
+                        <ListGroup.Item
+                            key={req.id}
+                            action
+                            onClick={() => handleUserClick(req.to)}
                             className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {req.toUsername}
-                                <DeleteButton onClick={() => handleDeleteClick(req.id)} />
+                                <DeleteButton onClick={() => handleDeleteClick(req.to)} />
                             </div>
                         </ListGroup.Item>
                     ))}

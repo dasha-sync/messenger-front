@@ -11,7 +11,7 @@ import './ChatsSidebar.css'
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import Alert from '../../../components/controls/Alert';
 
-const ChatsSidebar = () => {
+const ChatsSidebar = ({ onDisplaySelect }) => {
     const [activeTab, setActiveTab] = useState('chats');
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [loadingRequests, setLoadingRequests] = useState(true);
@@ -30,30 +30,34 @@ const ChatsSidebar = () => {
         };
 
         fetchIncomingRequests();
-    }, []);
+    }, [handleError]);
 
 
     const renderContent = () => {
         switch (activeTab) {
             case 'chats':
                 return (
-                    <ChatsList />
+                    <ChatsList onDisplaySelect={onDisplaySelect} />
                 );
             case 'contacts':
                 return (
-                    <ContactsList />
+                    <ContactsList onDisplaySelect={onDisplaySelect} />
                 );
             case 'sentRequests':
                 return (
-                    <SentRequestList />
+                    <SentRequestList onDisplaySelect={onDisplaySelect} />
                 );
             case 'receivedRequests':
                 return (
-                    <ReceivedRequestsList incomingRequests={incomingRequests} loading={loadingRequests} error={error} />
+                    <ReceivedRequestsList
+                        incomingRequests={incomingRequests}
+                        loading={loadingRequests}
+                        error={error}
+                        onDisplaySelect={onDisplaySelect} />
                 );
             case 'search':
                 return (
-                    <SearchList />
+                    <SearchList onDisplaySelect={onDisplaySelect} />
                 );
             default:
                 return null;
