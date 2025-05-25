@@ -120,10 +120,10 @@ button:focus-visible {
   --bs-btn-hover-bg: #da213a;
   --bs-btn-hover-border-color: #da213a;
   --bs-btn-active-color: #da213a;
-  --bs-btn-active-bg: #2e2d2d;
+  --bs-btn-active-bg: transparent;
   --bs-btn-active-border-color: #da213a;
   --bs-btn-disabled-color: #da213a;
-  --bs-btn-disabled-bg: #2e2d2d;
+  --bs-btn-disabled-bg: transparent;
   --bs-btn-disabled-border-color: #da213a;
   --bs-gradient: none;
 }

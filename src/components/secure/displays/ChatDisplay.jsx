@@ -53,11 +53,53 @@ const ChatDisplay = ({ chatId }) => {
             const response = await api.post(MESSAGES.CREATE(chatId), {
                 text: newMessage
             });
-            setMessages(prev => [...prev, response.data.data]);
+            setMessages(prev => [...prev, response.data]);
             setNewMessage('');
         } catch (err) {
             handleError(err, 'DANGER');
         }
+    };
+
+    const groupMessagesByDate = (messages) => {
+        const groups = {};
+        messages.forEach(message => {
+            const date = new Date(message.createdAt);
+            const dateKey = date.toLocaleDateString();
+            if (!groups[dateKey]) {
+                groups[dateKey] = [];
+            }
+            groups[dateKey].push(message);
+        });
+        return groups;
+    };
+
+    const formatMessageTime = (dateString) => {
+        return new Date(dateString).toLocaleTimeString([], {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
+    const formatDateHeader = (dateString) => {
+        const today = new Date();
+        const messageDate = new Date(dateString);
+
+        if (messageDate.toDateString() === today.toDateString()) {
+            return 'Today';
+        }
+
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        if (messageDate.toDateString() === yesterday.toDateString()) {
+            return 'Yesterday';
+        }
+
+        return messageDate.toLocaleDateString([], {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
     };
 
     if (!chatId) {
@@ -98,27 +140,38 @@ const ChatDisplay = ({ chatId }) => {
             )}
 
             {/* Chat header */}
-            <div className="chat-header p-3 border-bottom">
+            <div className="p-3 border-bottom">
                 <h5 className="mb-0">{chatInfo?.name || 'Chat'}</h5>
             </div>
 
             {/* Messages area */}
             <div className="messages-area flex-grow-1 p-3 overflow-auto">
-                {messages.map((message) => (
-                    <div
-                        key={message.id}
-                        className={`message mb-3 ${message.isOwn ? 'message-own' : 'message-other'
-                            }`}
-                    >
-                        <div className="message-content p-2 rounded">
-                            <div className="message-sender small text-muted mb-1">
-                                {message.senderUsername}
-                            </div>
-                            <div className="message-text">{message.content}</div>
-                            <div className="message-time small text-muted text-end">
-                                {new Date(message.createdAt).toLocaleTimeString()}
-                            </div>
+                {Object.entries(groupMessagesByDate(messages)).map(([date, dateMessages]) => (
+                    <div key={date} className="message-group d-flex flex-column  mb-4">
+                        <div className="date-header d-flex justify-content-center text-center mb-3">
+                            <span className="date-badge bg-light-subtle px-3 py-1 rounded-pill">
+                                {formatDateHeader(date)}
+                            </span>
                         </div>
+                        {dateMessages.map((message) => (
+                            <div
+                                key={message.id}
+                                className={`message mb-3 ${message.username === localStorage.getItem("username")
+                                    ? 'message-own'
+                                    : 'message-other'
+                                    }`}
+                            >
+                                <div className="message-content p-2 rounded">
+                                    <div className="message-sender small text-muted mb-1">
+                                        {message.username}
+                                    </div>
+                                    <div className="message-text">{message.text}</div>
+                                    <div className="message-time small text-muted text-end">
+                                        {formatMessageTime(message.createdAt)}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 ))}
                 <div ref={messagesEndRef} />
