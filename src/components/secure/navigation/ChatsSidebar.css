@@ -5,7 +5,7 @@
 }
 
 .hover-border:hover {
-    border: 1px solid #646cff !important;
+    border: 1px solid #8ec736 !important;
     margin-bottom: 2px;
 }
 
@@ -20,11 +20,11 @@
 }
 
 .nav-link {
-    color: #a4a8ff;
+    color: #b7ff5d;
 }
 
 .nav-link:hover {
-    color: #a4a8ff;
+    color: #b7ff5d;
 }
 
 .list {
@@ -56,7 +56,7 @@
 }
 
 .list::-webkit-scrollbar-thumb:hover {
-    background-color: #646cff;
+    background-color: #8ec736;
     border-radius: 10px;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .horizontal-scroll::-webkit-scrollbar-thumb:hover {
-    background-color: #646cff;
+    background-color: #8ec736;
      border-radius: 10px;
 }
 

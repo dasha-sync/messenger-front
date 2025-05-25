@@ -43,7 +43,6 @@ const ContactsList = ({ onDisplaySelect }) => {
 
     /*const handleDeleteClick = async (contactId) => {
         try {
-            // eslint-disable-next-line no-unused-vars
             const response = await api.delete(CONTACTS.DELETE(contactId));
             setContacts(prevContacts => ({
                 ...prevContacts,

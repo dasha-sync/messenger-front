@@ -19,7 +19,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
                     setUser(userResponse.data.data)
                     const relationsResponse = await api.get(USERS.RELATIONS(userId))
                     setRelations(relationsResponse.data.data)
-                    console.log(relationsResponse)
+                    handleError(relationsResponse.data, 'SUCCESS');
                 }
             } catch (err) {
                 handleError(err, 'DANGER');
@@ -118,7 +118,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
     }
 
     return (
-        <div className="chat-container bg-transparent ms-3">
+        <div className="user-dispay bg-transparent ms-3">
             {error && (
                 <Alert
                     message={error.message}
@@ -198,7 +198,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
                                     <div className="d-flex justify-content-start align-items-center mb-3">
                                         Contact request is waiting for your approval.
                                         <div className="d-flex gap-2 flex-wrap mx-3">
-                                            <button type="button" className="btn btn-outline-warning" onClick={approve}>Approve</button>
+                                            <button type="button" className="btn btn-primary" onClick={approve}>Approve</button>
                                             <button type="button" className="btn btn-outline-info" onClick={reject}>Reject</button>
                                         </div>
                                     </div>

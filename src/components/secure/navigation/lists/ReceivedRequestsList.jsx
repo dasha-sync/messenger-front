@@ -19,9 +19,9 @@ const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) =>
 
     const handleApproveClick = async (reqId) => {
         try {
-            // eslint-disable-next-line no-unused-vars
             const response = await api.post(REQUESTS.APPROVE(reqId));
             setRequests(prevRequests => prevRequests.filter(request => request.id !== reqId));
+            handleError(response.data, 'SUCCESS');
         } catch (err) {
             handleError(err, 'DANGER');
         }
@@ -29,9 +29,9 @@ const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) =>
 
     const handleRejectClick = async (reqId) => {
         try {
-            // eslint-disable-next-line no-unused-vars
             const response = await api.post(REQUESTS.REJECT(reqId));
             setRequests(prevRequests => prevRequests.filter(request => request.id !== reqId));
+            handleError(response.data, 'SUCCESS');
         } catch (err) {
             handleError(err, 'DANGER');
         }
@@ -61,7 +61,7 @@ const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) =>
                             <div className="d-flex justify-content-between">
                                 <div>{req.fromUsername}</div>
                                 <div className="btn-group btn-group-sm" role="group">
-                                    <a type="button" className="btn btn-request btn-outline-warning" onClick={() => handleApproveClick(req.id)}>Approve</a>
+                                    <a type="button" className="btn btn-request btn-primary" onClick={() => handleApproveClick(req.id)}>Approve</a>
                                     <a type="button" className="btn btn-request btn-outline-info" onClick={() => handleRejectClick(req.id)}>Reject</a>
                                 </div>
                             </div>

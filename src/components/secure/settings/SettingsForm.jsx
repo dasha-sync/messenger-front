@@ -61,15 +61,13 @@ const SettingsForm = () => {
                 password: credentials.currentPassword
             });
 
-            console.log(deleteFlag);
-
             if (authResponse.data?.data?.token && authResponse.data?.data?.user?.id) {
                 if (!deleteFlag) {
                     try {
                         const updateResponse = await api.patch(USERS.UPDATE, finalCredentials);
 
                         if (updateResponse.data?.data?.token) {
-                            console.log(updateResponse.data.data.token)
+                            handleError(updateResponse.data, 'SUCCESS');
                             localStorage.setItem('token', updateResponse.data.data.token);
                             localStorage.setItem('username', updateResponse.data.data.user.username);
                             localStorage.setItem('email', updateResponse.data.data.user.email);
@@ -80,9 +78,8 @@ const SettingsForm = () => {
                     }
                 } else {
                     try {
-                        console.log({ password: finalCredentials.currentPassword })
                         const deleteResponse = await api.delete(USERS.DELETE, { data: { password: finalCredentials.currentPassword } });
-                        console.log(deleteResponse)
+                        handleError(deleteResponse.data, 'SUCCESS');
                         localStorage.removeItem("token");
                         localStorage.removeItem("username");
                         localStorage.removeItem("email");
@@ -166,7 +163,7 @@ const SettingsForm = () => {
                                 'Update Profile'
                             )}
                         </Button>
-                        <Button variant="danger"
+                        <Button variant="outline-danger"
                             type="button"
                             disabled={isLoading}
                             onClick={() => {
@@ -179,7 +176,7 @@ const SettingsForm = () => {
                                     Deleting...
                                 </>
                             ) : (
-                                'Delete Prifile'
+                                'Delete Profile'
                             )}
                         </Button>
                     </div>
