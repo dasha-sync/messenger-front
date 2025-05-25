@@ -149,7 +149,7 @@ const ChatDisplay = ({ chatId }) => {
                 {Object.entries(groupMessagesByDate(messages)).map(([date, dateMessages]) => (
                     <div key={date} className="message-group d-flex flex-column  mb-4">
                         <div className="date-header d-flex justify-content-center text-center mb-3">
-                            <span className="date-badge bg-light-subtle px-3 py-1 rounded-pill">
+                            <span className="date-badge badge px-3 py-1">
                                 {formatDateHeader(date)}
                             </span>
                         </div>
@@ -161,13 +161,19 @@ const ChatDisplay = ({ chatId }) => {
                                     : 'message-other'
                                     }`}
                             >
-                                <div className="message-content p-2 rounded">
-                                    <div className="message-sender small text-muted mb-1">
+                                <div className={`d-flex flex-column ${message.username === localStorage.getItem("username")
+                                    ? 'align-items-end'
+                                    : 'align-items-start'
+                                    }`}>
+                                    <div className=" small text-muted mb-1 mx-2">
                                         {message.username}
                                     </div>
-                                    <div className="message-text">{message.text}</div>
-                                    <div className="message-time small text-muted text-end">
-                                        {formatMessageTime(message.createdAt)}
+                                    <div className="align-items-start message-content p-2 rounded text-left">
+
+                                        <div className="message-text">{message.text}</div>
+                                        <div className="message-time small text-muted text-end">
+                                            {formatMessageTime(message.createdAt)}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -179,13 +185,13 @@ const ChatDisplay = ({ chatId }) => {
 
             {/* Message input form */}
             <div className="message-input-area p-3 border-top">
-                <Form onSubmit={handleSendMessage} className="d-flex gap-2">
+                <Form onSubmit={handleSendMessage} className="d-flex gap-2 ">
                     <Form.Control
                         type="text"
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         placeholder="Type a message..."
-                        className="flex-grow-1"
+                        className="flex-grow-1 bg-body-tertiary"
                     />
                     <Button type="submit" variant="primary">
                         Send

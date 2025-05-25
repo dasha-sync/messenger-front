@@ -23,7 +23,7 @@
 
 .info a {
     text-decoration: underline;
-    color: #646cff;
+    color: var(--bs-info);
 }
 
 .info a:hover {

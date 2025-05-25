@@ -19,7 +19,7 @@
 }
 
 .message {
-    max-width: 70%;
+    max-width: 60%;
     display: flex;
     flex-direction: column;
 }
@@ -49,6 +49,7 @@
 
 .message-text {
     word-wrap: break-word;
+    text-align: left;
 }
 
 .message-time {
@@ -80,10 +81,12 @@
 
 .messages-area::-webkit-scrollbar-thumb {
     background-color: var(--bs-border-color);
+    border-radius: 10px;
 }
 
 .messages-area::-webkit-scrollbar-thumb:hover {
     background-color: #646cff;
+    border-radius: 10px;
 }
 
 .message-group {

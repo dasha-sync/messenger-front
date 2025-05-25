@@ -88,7 +88,7 @@ const SearchList = ({ onDisplaySelect }) => {
                 placeholder="Find by username or email"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="mb-3 bg-body-secondary search"
+                className="mb-3 bg-body-tertiary search"
             />
             <div className="list">
                 <ListGroup>
@@ -97,7 +97,7 @@ const SearchList = ({ onDisplaySelect }) => {
                             key={user.id}
                             action
                             onClick={() => handleUserClick(user.id)}
-                            className="bg-body-secondary hover-border text-start d-flex align-items-end justify-content-between">
+                            className="bg-body-tertiary hover-border text-start d-flex align-items-end justify-content-between">
                             <b>{user.username}</b><div className="text-muted small">{user.email}</div>
                         </ListGroup.Item>
                     ))}
