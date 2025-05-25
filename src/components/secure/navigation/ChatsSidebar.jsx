@@ -78,27 +78,27 @@ const ChatsSidebar = ({ onDisplaySelect }) => {
                     <Nav
                         variant="tabs"
                         activeKey={activeTab}
-                        className="custom-tabs flex-nowrap"
+                        className="custom-tabs flex-nowrap icon"
                         onSelect={(k) => setActiveTab(k)}>
                         <Nav.Item>
-                            <Nav.Link eventKey="chats">Chats</Nav.Link>
+                            <Nav.Link eventKey="chats"><i className="bi bi-chat-right-dots"></i></Nav.Link>{/*chats */}
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="contacts">Contacts</Nav.Link>
+                            <Nav.Link eventKey="contacts"><i className="bi bi-telephone"></i></Nav.Link>{/*contacts */}
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="sentRequests">Outgoing</Nav.Link>
+                            <Nav.Link eventKey="sentRequests"><i className="bi bi-telephone-outbound"></i></Nav.Link>{/*outgoing requests */}
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="receivedRequests" className="d-flex flex-row flex-nowrap">
-                                Incoming{' '}
+                            <Nav.Link eventKey="receivedRequests" className="d-flex flex-row flex-nowrap">{/*incoming requests */}
+                                <i className="bi bi-telephone-inbound"></i>{' '}
                                 {!loadingRequests && incomingRequests.length > 0 && (
                                     <span className="notification-dot"></span>
                                 )}
                             </Nav.Link>
                         </Nav.Item>
                         <Nav.Item>
-                            <Nav.Link eventKey="search">Search</Nav.Link>
+                            <Nav.Link eventKey="search"><i className="bi bi-search"></i></Nav.Link>{/*search */}
                         </Nav.Item>
                     </Nav>
                 </div>

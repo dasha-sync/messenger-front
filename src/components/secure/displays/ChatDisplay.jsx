@@ -1,18 +1,20 @@
 import { useEffect, useState, useRef } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import api from '../../../api/config';
-import { CHATS, MESSAGES } from '../../../api/routes';
+import { CHATS, MESSAGES, USERS } from '../../../api/routes';
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import Alert from '../../controls/Alert';
 import './ChatDisplay.css';
 
-const ChatDisplay = ({ chatId }) => {
+const ChatDisplay = ({ chatId, onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [chatInfo, setChatInfo] = useState(null);
     const messagesEndRef = useRef(null);
     const [loading, setLoading] = useState(true);
+    const [isHovered, setIsHovered] = useState(false);
+    const [isActive, setIsActive] = useState(false);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -102,9 +104,24 @@ const ChatDisplay = ({ chatId }) => {
         });
     };
 
+    const goToUser = async (chatName) => {
+        var id = false;
+        try {
+            const response = await api.post(USERS.LIST, {
+                username: chatName,
+                email: ""
+            });
+            id = response.data.data.at(0).id
+        } catch (err) {
+            handleError(err, 'DANGER');
+        }
+        onDisplaySelect(id, false);
+    }
+
+
     if (!chatId) {
         return (
-            <div className="chat-container bg-body-tertiary border rounded-3 ms-3">
+            <div className="bg-body-tertiary border rounded-3 ms-3">
                 {error && (
                     <Alert
                         message={error.message}
@@ -121,82 +138,105 @@ const ChatDisplay = ({ chatId }) => {
 
     if (loading) {
         return (
-            <div className="chat-container bg-body-tertiary border rounded-3 ms-3 d-flex justify-content-center align-items-center">
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
+            <div className="display-chat ms-3 justify-content-center align-items-center">
+                <div className="bg-body-tertiary border rounded-3 ms-3 d-flex justify-content-center align-items-center">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
                 </div>
             </div>
         );
     }
 
+
+    const handleMouseEnter = () => setIsHovered(true);
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+        setIsActive(false);
+    };
+    const handleMouseDown = () => setIsActive(true);
+    const handleMouseUp = () => setIsActive(false);
+    const iconClass = isActive ? "bi-send" : isHovered ? "bi-send-fill" : "bi-send";
+
+
+
     return (
-        <div className="chat-container bg-body-tertiary border rounded-3 ms-3 d-flex flex-column">
-            {error && (
-                <Alert
-                    message={error.message}
-                    status={error.status}
-                    onClose={clearError}
-                />
-            )}
+        <div className="display-chat ms-3 justify-content-center align-items-center">
+            <div className="chat-container bg-body-tertiary border rounded-3 d-flex flex-column">
+                {error && (
+                    <Alert
+                        message={error.message}
+                        status={error.status}
+                        onClose={clearError}
+                    />
+                )}
 
-            {/* Chat header */}
-            <div className="p-3 border-bottom">
-                <h5 className="mb-0">{chatInfo?.name || 'Chat'}</h5>
-            </div>
+                {/* Chat header */}
+                <div className="p-2 border-bottom d-flex justify-content-start">
+                    <h5 className="mb-0 btn btn-outline-warning" onClick={() => { goToUser(chatInfo?.name || 'Chat') }}>{chatInfo?.name || 'Chat'}</h5>
+                </div>
 
-            {/* Messages area */}
-            <div className="messages-area flex-grow-1 p-3 overflow-auto">
-                {Object.entries(groupMessagesByDate(messages)).map(([date, dateMessages]) => (
-                    <div key={date} className="message-group d-flex flex-column  mb-4">
-                        <div className="date-header d-flex justify-content-center text-center mb-3">
-                            <span className="date-badge badge px-3 py-1">
-                                {formatDateHeader(date)}
-                            </span>
-                        </div>
-                        {dateMessages.map((message) => (
-                            <div
-                                key={message.id}
-                                className={`message mb-3 ${message.username === localStorage.getItem("username")
-                                    ? 'message-own'
-                                    : 'message-other'
-                                    }`}
-                            >
-                                <div className={`d-flex flex-column ${message.username === localStorage.getItem("username")
-                                    ? 'align-items-end'
-                                    : 'align-items-start'
-                                    }`}>
-                                    <div className=" small text-muted mb-1 mx-2">
-                                        {message.username}
-                                    </div>
-                                    <div className="align-items-start message-content p-2 rounded text-left">
+                {/* Messages area */}
+                <div className="messages-area flex-grow-1 p-3 overflow-auto">
+                    {Object.entries(groupMessagesByDate(messages)).map(([date, dateMessages]) => (
+                        <div key={date} className="message-group d-flex flex-column  mb-4">
+                            <div className="date-header d-flex justify-content-center text-center mb-3">
+                                <span className="date-badge badge px-3 py-1">
+                                    {formatDateHeader(date)}
+                                </span>
+                            </div>
+                            {dateMessages.map((message) => (
+                                <div
+                                    key={message.id}
+                                    className={`message mb-3 ${message.username === localStorage.getItem("username")
+                                        ? 'message-own'
+                                        : 'message-other'
+                                        }`}
+                                >
+                                    <div className={`d-flex flex-column ${message.username === localStorage.getItem("username")
+                                        ? 'align-items-end'
+                                        : 'align-items-start'
+                                        }`}>
+                                        <div className=" small text-muted mb-1 mx-2">
+                                            {message.username}
+                                        </div>
+                                        <div className="align-items-start message-content p-2 rounded text-left">
 
-                                        <div className="message-text">{message.text}</div>
-                                        <div className="message-time small text-muted text-end">
-                                            {formatMessageTime(message.createdAt)}
+                                            <div className="message-text">{message.text}</div>
+                                            <div className="message-time small text-muted text-end">
+                                                {formatMessageTime(message.createdAt)}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                ))}
-                <div ref={messagesEndRef} />
-            </div>
+                            ))}
+                        </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                </div>
 
-            {/* Message input form */}
-            <div className="message-input-area p-3 border-top">
-                <Form onSubmit={handleSendMessage} className="d-flex gap-2 ">
-                    <Form.Control
-                        type="text"
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Type a message..."
-                        className="flex-grow-1 bg-body-tertiary"
-                    />
-                    <Button type="submit" variant="primary">
-                        Send
-                    </Button>
-                </Form>
+                {/* Message input form */}
+                <div className="message-input-area p-3 border-top">
+                    <Form onSubmit={handleSendMessage} className="d-flex gap-2 ">
+                        <Form.Control
+                            type="text"
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder="Type a message..."
+                            className="flex-grow-1 bg-body-tertiary"
+                        />
+                        <Button
+                            type="submit"
+                            className="btn-icon"
+                            variant="primary"
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onMouseDown={handleMouseDown}
+                            onMouseUp={handleMouseUp}>
+                            <i className={`bi ${iconClass}`}></i>
+                        </Button>
+                    </Form>
+                </div>
             </div>
         </div>
     );

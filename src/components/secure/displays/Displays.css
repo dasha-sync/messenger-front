@@ -7,3 +7,16 @@
     margin-right: 5%;
 }
 
+.user-dispay {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    height: 100%;
+    width: 80%;
+    flex-direction: column;
+    height: 90vh;
+}
+
+.user-profile {
+    width: 100%;
+}

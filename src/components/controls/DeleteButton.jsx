@@ -18,7 +18,7 @@ function DeleteButton({ onClick }) {
   const iconClass = isActive ? "bi-trash3" : isHovered ? "bi-trash3-fill" : "bi-trash3";
 
   return (
-    <a className="btn btn-outline-danger btn-sm trash"
+    <a className="btn btn-outline-danger-icon btn-sm trash"
       onClick={onClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

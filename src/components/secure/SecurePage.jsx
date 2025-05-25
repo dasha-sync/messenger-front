@@ -65,7 +65,7 @@ const SecurePage = () => {
                 <div className="d-flex w-100">
                     <ChatsSidebar onDisplaySelect={setDisplay} />
                     {isChat ? (
-                        <ChatDisplay chatId={selectedId} />
+                        <ChatDisplay chatId={selectedId} onDisplaySelect={setDisplay} />
                     ) : (
                         <UserDisplay userId={selectedId} onDisplaySelect={setDisplay} />
                     )}

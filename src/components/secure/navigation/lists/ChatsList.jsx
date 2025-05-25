@@ -40,7 +40,6 @@ const ChatsList = ({ onDisplaySelect }) => {
     /*
         const handleDeleteClick = async (chatId) => {
             try {
-                // eslint-disable-next-line no-unused-vars
                 const response = await api.delete(CHATS.DELETE(chatId));
                 setChats(prevChats => ({
                     ...prevChats,

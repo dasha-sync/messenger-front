@@ -4,8 +4,6 @@ export const useErrorHandler = () => {
     const [error, setError] = useState(null);
 
     const handleError = useCallback((err, customStatus = null) => {
-        console.log(err?.response?.data?.message); // безопасный лог
-
         if (err.code === 'ECONNABORTED') {
             setError({
                 message: 'Connection timeout. Please try again.',

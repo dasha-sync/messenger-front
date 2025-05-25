@@ -1,5 +1,5 @@
 .welcome-text {
-    color: #a4a8ff;
+    color: #b7ff5d;
     margin-bottom: 10%;
     font-size: 150px;
     min-width: max-content;
@@ -18,7 +18,7 @@
 }
 
 .info {
-    color: #a4a8ff;
+    color: #b7ff5d;
 }
 
 .info a {
@@ -28,5 +28,5 @@
 
 .info a:hover {
     text-decoration: underline;
-    color: #a4a8ff;
+    color: #b7ff5d;
 }

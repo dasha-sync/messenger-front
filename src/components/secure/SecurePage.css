@@ -1,5 +1,5 @@
 .welcome-text {
-    color: #a4a8ff;
+    color: #b7ff5d;
     margin-bottom: 2rem;
     font-size: 4rem;
 }
@@ -9,6 +9,7 @@
     height: 90vh;
     display: flex;
     flex-direction: column;
+    justify-content: center;
 }
 
 .chats-container {
@@ -17,14 +18,23 @@
 }
 
 .chat-container {
-    width: 80%;
+    width: 100%;
+    max-width: 900px;
+    overflow: hidden;
 }
 
 .username {
-    color: #646cff
+    color: #8ec736
 }
 
-.btn-outline-light {
-    border-color: #646cff;
-    color: #646cff;
+.icon {
+    font-size: large;
+}
+
+.btn-icon {
+    font-size: x-large;
+    padding-left: 9px !important;
+    padding-right: 9px !important;
+    padding-top: 2px !important;
+    padding-bottom: 0px !important;
 }
