@@ -30,7 +30,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
 
     if (!userId) {
         return (
-            <div className="chat-container bg-body-tertiary border rounded-3 ms-3 p-4">
+            <div className="chat-container bg-transparent border rounded-3 ms-3 p-4">
                 {error && (
                     <Alert
                         message={error.message}
@@ -118,7 +118,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
     }
 
     return (
-        <div className="chat-container bg-body-tertiary border rounded-3 ms-3 p-4">
+        <div className="chat-container bg-transparent ms-3">
             {error && (
                 <Alert
                     message={error.message}
@@ -129,7 +129,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
 
             {user ? (
                 <div className="user-profile">
-                    <div className="mb-4 card bg-light-subtle">
+                    <div className="mb-4 card bg-body-tertiary">
                         <div className="card-header bg-transparent">
                             <div className="d-flex justify-content-start align-items-end mb-1">
                                 {relations.hasContact ? (
@@ -162,7 +162,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
                     </div>
 
                     {/* Actions Card */}
-                    <div className="card bg-light-subtle">
+                    <div className="card bg-body-tertiary">
                         <div className="card-header bg-transparent d-flex justify-content-start  align-items-end mb-1">
                             <h5 className="mb-0">Actions Menu</h5>
                         </div>

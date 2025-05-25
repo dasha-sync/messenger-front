@@ -68,7 +68,7 @@ const SentRequestList = ({ onDisplaySelect }) => {
                             key={req.id}
                             action
                             onClick={() => handleUserClick(req.to)}
-                            className="bg-body-secondary hover-border text-start">
+                            className="bg-body-tertiary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {req.toUsername}
                                 <DeleteButton onClick={() => handleDeleteClick(req.id)} />

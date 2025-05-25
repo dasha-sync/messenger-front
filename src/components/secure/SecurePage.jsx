@@ -45,15 +45,15 @@ const SecurePage = () => {
         <div className="d-flex flex-column">
             <div className="d-flex justify-content-between bg-body-tertiary border rounded-bottom-3 mx-3 mb-3 pt-3">
                 <div className="d-flex my-auto mx-3 mb-3">
-                    <button type="button" size="lg" className="btn btn-outline-warning">
+                    <button type="button" size="lg" className="btn btn-outline-success">
                         {localStorage.getItem("username")}
                     </button>
+                </div>
+                <div className="d-flex my-auto mx-3 mb-3">
                     <p className="info my-auto mx-3 mb-2 text-muted small">
                         <a href="http://localhost:8080/swagger-ui.html">API documentation</a>
                     </p>
-                </div>
-                <div className="d-flex my-auto mx-3 mb-3">
-                    <button type="button" size="lg" className="btn btn-outline-primary mx-3" onClick={() => navigate('/settings')}>
+                    <button type="button" size="lg" className="btn btn-outline-info mx-3" onClick={() => navigate('/settings')}>
                         Settings
                     </button>
                     <button type="button" size="lg" className="btn btn-outline-secondary" onClick={handleLogout}>

@@ -70,7 +70,7 @@ const ContactsList = ({ onDisplaySelect }) => {
                             key={contact.id}
                             action
                             onClick={() => handleUserClick(contact.to)}
-                            className="bg-body-secondary hover-border text-start">
+                            className="bg-body-tertiary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {contact.toUsername}
                             </div>

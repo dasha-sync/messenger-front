@@ -57,7 +57,7 @@ const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) =>
                             key={req.id}
                             action
                             onClick={() => handleUserClick(req.from)}
-                            className="bg-body-secondary hover-border text-start">
+                            className="bg-body-tertiary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 <div>{req.fromUsername}</div>
                                 <div className="btn-group btn-group-sm" role="group">

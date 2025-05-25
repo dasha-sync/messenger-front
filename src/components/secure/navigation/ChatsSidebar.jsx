@@ -73,33 +73,35 @@ const ChatsSidebar = ({ onDisplaySelect }) => {
                     onClose={clearError}
                 />
             )}
-            <div className="horizontal-scroll">
-                <Nav
-                    variant="tabs"
-                    activeKey={activeTab}
-                    className="custom-tabs flex-nowrap"
-                    onSelect={(k) => setActiveTab(k)}>
-                    <Nav.Item>
-                        <Nav.Link eventKey="chats">Chats</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="contacts">Contacts</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="sentRequests">Outgoing</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="receivedRequests">
-                            Incoming{' '}
-                            {!loadingRequests && incomingRequests.length > 0 && (
-                                <span className="notification-dot"></span>
-                            )}
-                        </Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                        <Nav.Link eventKey="search">Search</Nav.Link>
-                    </Nav.Item>
-                </Nav>
+            <div className="d-flex flex-row justify-content-center">
+                <div className="horizontal-scroll overflow-auto">
+                    <Nav
+                        variant="tabs"
+                        activeKey={activeTab}
+                        className="custom-tabs flex-nowrap"
+                        onSelect={(k) => setActiveTab(k)}>
+                        <Nav.Item>
+                            <Nav.Link eventKey="chats">Chats</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link eventKey="contacts">Contacts</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link eventKey="sentRequests">Outgoing</Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link eventKey="receivedRequests" className="d-flex flex-row flex-nowrap">
+                                Incoming{' '}
+                                {!loadingRequests && incomingRequests.length > 0 && (
+                                    <span className="notification-dot"></span>
+                                )}
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link eventKey="search">Search</Nav.Link>
+                        </Nav.Item>
+                    </Nav>
+                </div>
             </div>
 
             <div className="mt-3">{renderContent()}</div>

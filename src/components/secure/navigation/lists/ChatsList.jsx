@@ -70,7 +70,7 @@ const ChatsList = ({ onDisplaySelect }) => {
                             key={chat.id}
                             action
                             onClick={() => handleChatClick(chat.id)}
-                            className="bg-body-secondary hover-border text-start">
+                            className="bg-body-tertiary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {chat.name}
                             </div>
