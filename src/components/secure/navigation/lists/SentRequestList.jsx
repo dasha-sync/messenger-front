@@ -40,6 +40,7 @@ const SentRequestList = ({ onDisplaySelect }) => {
 
     const handleDeleteClick = async (requestId) => {
         try {
+            console.log(requestId)
             // eslint-disable-next-line no-unused-vars
             const response = await api.delete(REQUESTS.DELETE(requestId));
             setOutgoingRequests(prevRequests => ({
@@ -70,7 +71,7 @@ const SentRequestList = ({ onDisplaySelect }) => {
                             className="bg-body-secondary hover-border text-start">
                             <div className="d-flex justify-content-between">
                                 {req.toUsername}
-                                <DeleteButton onClick={() => handleDeleteClick(req.to)} />
+                                <DeleteButton onClick={() => handleDeleteClick(req.id)} />
                             </div>
                         </ListGroup.Item>
                     ))}
