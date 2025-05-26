@@ -34,7 +34,7 @@ const ChatsList = ({ onDisplaySelect }) => {
         return <Spinner animation="border" />;
     }
 
-    if (!chats.data.chats.length) {
+    if (!chats?.data?.chats?.length) {
         return <div className="text-info">No chats.</div>;
     }
     /*

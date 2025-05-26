@@ -27,9 +27,8 @@ export const useAuth = (isSignUp = false) => {
             const signInResponse = await api.post(AUTH.SIGNIN, credentials, { timeout: 5000 });
 
             if (signInResponse.data?.data?.token) {
-                localStorage.setItem('token', signInResponse.data.data.token);
-                localStorage.setItem('username', signInResponse.data.data.user.username);
-                localStorage.setItem('email', signInResponse.data.data.user.email);
+                sessionStorage.setItem('username', signInResponse.data.data.user.username);
+                sessionStorage.setItem('email', signInResponse.data.data.user.email);
                 window.dispatchEvent(new Event('authChange'));
                 navigate('/');
             } else {

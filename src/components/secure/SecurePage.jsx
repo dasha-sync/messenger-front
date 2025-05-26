@@ -5,26 +5,29 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import ChatsSidebar from './navigation/ChatsSidebar'
 import ChatDisplay from './displays/ChatDisplay'
 import UserDisplay from './displays/UserDisplay'
+import { useAuth } from './../controls/AuthContext'
+import Alert from './../controls/Alert';
 import '../auth/AuthPage.css';
 import './SecurePage.css';
 
 const SecurePage = () => {
     const navigate = useNavigate();
     const [selectedId, setSelectedId] = useState(() => {
-        const savedId = localStorage.getItem('selectedId');
+        const savedId = sessionStorage.getItem('selectedId');
         return savedId ? JSON.parse(savedId) : null;
     });
     const [isChat, setIsChat] = useState(() => {
-        const savedIsChat = localStorage.getItem('isChat');
+        const savedIsChat = sessionStorage.getItem('isChat');
         return savedIsChat ? JSON.parse(savedIsChat) : null;
     });
+    const { logout, error, clearError } = useAuth();
 
     useEffect(() => {
         if (selectedId !== null) {
-            localStorage.setItem('selectedId', JSON.stringify(selectedId));
+            sessionStorage.setItem('selectedId', JSON.stringify(selectedId));
         }
         if (isChat !== null) {
-            localStorage.setItem('isChat', JSON.stringify(isChat));
+            sessionStorage.setItem('isChat', JSON.stringify(isChat));
         }
     }, [selectedId, isChat]);
 
@@ -33,20 +36,24 @@ const SecurePage = () => {
         setIsChat(flag);
     }
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('selectedId');
-        localStorage.removeItem('isChat');
-        window.dispatchEvent(new Event('authChange'));
+    const handleLogout = async () => {
+        await logout();
         navigate('/welcome');
     };
 
     return (
         <div className="d-flex flex-column">
+            {error && (
+                <Alert
+                    message={error.message}
+                    status={error.status}
+                    onClose={clearError}
+                />
+            )}
             <div className="d-flex justify-content-between bg-body-tertiary border rounded-bottom-3 mx-3 mb-3 pt-3">
                 <div className="d-flex my-auto mx-3 mb-3">
                     <button type="button" size="lg" className="btn btn-outline-success">
-                        {localStorage.getItem("username")}
+                        {sessionStorage.getItem("username")}
                     </button>
                 </div>
                 <div className="d-flex my-auto mx-3 mb-3">
