@@ -188,12 +188,12 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
                             {dateMessages.map((message) => (
                                 <div
                                     key={message.id}
-                                    className={`message mb-3 ${message.username === localStorage.getItem("username")
+                                    className={`message mb-3 ${message.username === sessionStorage.getItem("username")
                                         ? 'message-own'
                                         : 'message-other'
                                         }`}
                                 >
-                                    <div className={`d-flex flex-column ${message.username === localStorage.getItem("username")
+                                    <div className={`d-flex flex-column ${message.username === sessionStorage.getItem("username")
                                         ? 'align-items-end'
                                         : 'align-items-start'
                                         }`}>

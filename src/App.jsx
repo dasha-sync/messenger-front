@@ -5,22 +5,50 @@ import SignInForm from './components/auth/forms/SignInForm';
 import SignUpForm from './components/auth/forms/SignUpForm';
 import SecurePage from './components/secure/SecurePage';
 import SettingsForm from './components/secure/settings/SettingsForm';
+import { useAuth } from './components/controls/AuthContext';
+import Alert from './components/controls/Alert';
+
 import './App.css';
 
-const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    return <Navigate to="/welcome" />;
+export const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, isLoading, error, clearError } = useAuth();
+
+  if (isLoading) return <div>Loading...</div>;
+
+  if (!isAuthenticated) {
+    return <Navigate to="/welcome" replace />;
   }
-  return children;
+
+  return (
+    <>
+      {error && (
+        <Alert
+          message={error.message}
+          status={error.status}
+          onClose={clearError}
+        />
+      )}
+      {children}
+    </>
+  );
 };
 
-const PublicRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    return <Navigate to="/" />;
-  }
-  return children;
+export const PublicRoute = ({ children }) => {
+  const { isAuthenticated, isLoading, error, clearError } = useAuth();
+
+  if (isLoading) return <div>Loading...</div>;
+  return (
+    <>
+      {error && (
+        <Alert
+          message={error.message}
+          status={error.status}
+          onClose={clearError}
+        />
+      )}
+      {isAuthenticated ? <Navigate to="/" /> : children}
+    </>
+  );
 };
 
 function App() {
@@ -36,6 +64,11 @@ function App() {
         <Route path="/settings" element={
           <ProtectedRoute>
             <SettingsForm />
+          </ProtectedRoute>
+        } />
+        <Route path="/secure" element={
+          <ProtectedRoute>
+            <SecurePage />
           </ProtectedRoute>
         } />
 

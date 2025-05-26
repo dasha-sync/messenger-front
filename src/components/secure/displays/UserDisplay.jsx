@@ -30,7 +30,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
 
     if (!userId) {
         return (
-            <div className="chat-container bg-transparent border rounded-3 ms-3 p-4">
+            <div className="empty-container bg-transparent border rounded-3 ms-3 p-4">
                 {error && (
                     <Alert
                         message={error.message}

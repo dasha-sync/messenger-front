@@ -23,6 +23,15 @@
     overflow: hidden;
 }
 
+.empty-container {
+    width: 100%;
+    overflow: hidden;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
 .username {
     color: #8ec736
 }

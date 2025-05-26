@@ -23,8 +23,8 @@ const SettingsForm = () => {
 
     // Load initial values from localStorage
     useEffect(() => {
-        const username = localStorage.getItem('username');
-        const email = localStorage.getItem('email');
+        const username = sessionStorage.getItem('username');
+        const email = sessionStorage.getItem('email');
         if (username && email) {
             setCredentials(prev => ({
                 ...prev,
@@ -57,7 +57,7 @@ const SettingsForm = () => {
             };
 
             const authResponse = await api.post(AUTH.SIGNIN, {
-                username: localStorage.getItem("username"),
+                username: sessionStorage.getItem("username"),
                 password: credentials.currentPassword
             });
 
@@ -68,9 +68,8 @@ const SettingsForm = () => {
 
                         if (updateResponse.data?.data?.token) {
                             handleError(updateResponse.data, 'SUCCESS');
-                            localStorage.setItem('token', updateResponse.data.data.token);
-                            localStorage.setItem('username', updateResponse.data.data.user.username);
-                            localStorage.setItem('email', updateResponse.data.data.user.email);
+                            sessionStorage.setItem('username', updateResponse.data.data.user.username);
+                            sessionStorage.setItem('email', updateResponse.data.data.user.email);
                             navigate('/settings');
                         }
                     } catch (updateError) {
@@ -80,9 +79,8 @@ const SettingsForm = () => {
                     try {
                         const deleteResponse = await api.delete(USERS.DELETE, { data: { password: finalCredentials.currentPassword } });
                         handleError(deleteResponse.data, 'SUCCESS');
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("username");
-                        localStorage.removeItem("email");
+                        sessionStorage.removeItem("username");
+                        sessionStorage.removeItem("email");
                         navigate('/');
                     } catch (updateError) {
                         handleError(updateError)

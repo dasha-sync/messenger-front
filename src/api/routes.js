@@ -22,6 +22,8 @@ const replaceParams = (url, params) => {
 export const AUTH = {
     SIGNUP: `${BASE.AUTH}/signup`,
     SIGNIN: `${BASE.AUTH}/signin`,
+    CHECK: `${BASE.AUTH}/check`,
+    SIGNOUT: `${BASE.AUTH}/signout`,
 };
 
 // Чаты
