@@ -1,45 +1,48 @@
-import { useEffect, useState, useRef } from 'react';
-import { Form, Button } from 'react-bootstrap';
-import SockJS from 'sockjs-client';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { Form, Button, Modal } from 'react-bootstrap';
 import api from '../../../api/config';
 import { CHATS, MESSAGES, USERS } from '../../../api/routes';
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
+import { useWebSocket } from '../../../hooks/useWebSocket';
 import Alert from '../../controls/Alert';
 import './ChatDisplay.css';
-import { Client } from '@stomp/stompjs';
 
 const ChatDisplay = ({ chatId, onDisplaySelect }) => {
-    const [stompClient, setStompClient] = useState(null);
     const { error, handleError, clearError } = useErrorHandler();
     const [messages, setMessages] = useState([]);
-    const [newMessage, setNewMessage] = useState('');
     const [chatInfo, setChatInfo] = useState(null);
-    const messagesEndRef = useRef(null);
     const [loading, setLoading] = useState(true);
-    const [isHovered, setIsHovered] = useState(false);
-    const [isActive, setIsActive] = useState(false);
+    const [newMessage, setNewMessage] = useState('');
+    const [editingMessage, setEditingMessage] = useState(null);
+    const [editedText, setEditedText] = useState('');
+    const [showEditModal, setShowEditModal] = useState(false);
+    const messagesEndRef = useRef(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const { publish, isConnected } = useWebSocket(chatId, useCallback((message) => {
+        const updateMessages = {
+            CREATE: () => setMessages(prev => [...prev, message]),
+            UPDATE: () => setMessages(prev => prev.map(msg => msg.id === message.id ? message : msg)),
+            DELETE: () => setMessages(prev => prev.filter(msg => msg.id !== message.id)),
+        };
+        updateMessages[message.action]?.();
+    }, []));
 
     useEffect(() => {
-        scrollToBottom();
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [messages]);
 
     useEffect(() => {
-        const fetchChatData = async () => {
-            try {
-                if (chatId) {
-                    setLoading(true);
-                    // Fetch chat info
-                    const chatResponse = await api.get(CHATS.GET_BY_ID(chatId));
-                    setChatInfo(chatResponse.data.data);
+        if (!chatId) return;
 
-                    // Fetch messages
-                    const messagesResponse = await api.get(MESSAGES.LIST(chatId));
-                    setMessages(messagesResponse.data.data);
-                }
+        const fetchChatData = async () => {
+            setLoading(true);
+            try {
+                const [chatRes, msgRes] = await Promise.all([
+                    api.get(CHATS.GET_BY_ID(chatId)),
+                    api.get(MESSAGES.LIST(chatId))
+                ]);
+                setChatInfo(chatRes.data.data);
+                setMessages(msgRes.data.data);
             } catch (err) {
                 handleError(err, 'DANGER');
             } finally {
@@ -50,140 +53,77 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
         fetchChatData();
     }, [chatId, handleError]);
 
-    useEffect(() => {
-        if (!chatId) return;
-
-        const socket = new SockJS('/ws');
-        const stomp = new Client({
-            webSocketFactory: () => socket,
-            connectHeaders: {
-                // The token is automatically sent in cookies
-            },
-            debug: (str) => {
-                console.log(str);
-            },
-            reconnectDelay: 5000,
-            heartbeatIncoming: 4000,
-            heartbeatOutgoing: 4000,
-        });
-
-        stomp.onConnect = () => {
-            console.log('Connected to WebSocket');
-            // Subscribe to the chat's message topic
-            stomp.subscribe(`/topic/chats/${chatId}/messages`, (message) => {
-                const receivedMessage = JSON.parse(message.body);
-                handleIncomingMessage(receivedMessage);
-            });
-        };
-
-        stomp.onStompError = (frame) => {
-            console.error('STOMP error:', frame);
-            handleError(new Error('WebSocket connection error'), 'DANGER');
-        };
-
-        stomp.activate();
-        setStompClient(stomp);
-
-        // Cleanup on unmount
-        return () => {
-            if (stomp.connected) {
-                stomp.deactivate();
-            }
-        };
-    }, [chatId, handleError]);
-
-    const handleIncomingMessage = (message) => {
-        setMessages(prev => {
-            // Handle different message types
-            switch (message.type) {
-                case 'CREATE':
-                    return [...prev, message];
-                case 'UPDATE':
-                    return prev.map(msg => msg.id === message.id ? message : msg);
-                case 'DELETE':
-                    return prev.filter(msg => msg.id !== message.id);
-                default:
-                    return prev;
-            }
-        });
-    };
-
     const handleSendMessage = async (e) => {
         e.preventDefault();
-
-        if (!newMessage.trim() || !stompClient?.connected) return;
+        if (!newMessage.trim() || !isConnected) return;
 
         try {
-            stompClient.publish({
-                destination: `/app/chats/${chatId}/messages/create`,
-                body: JSON.stringify({ text: newMessage })
-            });
+            publish(`/app/secured/chats/${chatId}/messages/create`, { text: newMessage });
             setNewMessage('');
-        } catch (err) {
-            handleError(err, 'DANGER');
+        } catch (error) {
+            handleError(error, 'DANGER');
         }
     };
 
-    const handleUpdateMessage = async (messageId, newText) => {
-        if (!stompClient?.connected) return;
+    const handleUpdateMessage = async () => {
+        if (!editedText.trim() || !isConnected || !editingMessage) return;
 
         try {
-            stompClient.publish({
-                destination: `/app/chats/${chatId}/messages/${messageId}/update`,
-                body: JSON.stringify({ text: newText })
-            });
-        } catch (err) {
-            handleError(err, 'DANGER');
+            publish(`/app/secured/chats/${chatId}/messages/${editingMessage.id}/update`, { newContent: editedText });
+            setShowEditModal(false);
+            setEditingMessage(null);
+            setEditedText('');
+        } catch (error) {
+            handleError(error, 'DANGER');
         }
     };
 
     const handleDeleteMessage = async (messageId) => {
-        if (!stompClient?.connected) return;
+        if (!isConnected) return;
 
         try {
-            stompClient.publish({
-                destination: `/app/chats/${chatId}/messages/${messageId}/destroy`
-            });
+            publish(`/app/secured/chats/${chatId}/messages/${messageId}/destroy`);
+        } catch (error) {
+            handleError(error, 'DANGER');
+        }
+    };
+
+    const openEditModal = (message) => {
+        setEditingMessage(message);
+        setEditedText(message.text);
+        setShowEditModal(true);
+    };
+
+    const goToUser = async (chatName) => {
+        try {
+            const response = await api.post(USERS.LIST, { username: chatName, email: "" });
+            const userId = response.data.data[0]?.id;
+            if (userId) onDisplaySelect(userId, false);
         } catch (err) {
             handleError(err, 'DANGER');
         }
     };
 
-    const groupMessagesByDate = (messages) => {
-        const groups = {};
-        messages.forEach(message => {
-            const date = new Date(message.createdAt);
-            const dateKey = date.toLocaleDateString();
-            if (!groups[dateKey]) {
-                groups[dateKey] = [];
-            }
-            groups[dateKey].push(message);
-        });
-        return groups;
+    const groupMessagesByDate = (msgs) => {
+        return msgs.reduce((groups, msg) => {
+            const dateKey = new Date(msg.createdAt).toLocaleDateString();
+            groups[dateKey] = [...(groups[dateKey] || []), msg];
+            return groups;
+        }, {});
     };
 
-    const formatMessageTime = (dateString) => {
-        return new Date(dateString).toLocaleTimeString([], {
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+    const formatMessageTime = (dateStr) => new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-    const formatDateHeader = (dateString) => {
+    const formatDateHeader = (dateStr) => {
         const today = new Date();
-        const messageDate = new Date(dateString);
-
-        if (messageDate.toDateString() === today.toDateString()) {
-            return 'Today';
-        }
-
+        const date = new Date(dateStr);
         const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        if (messageDate.toDateString() === yesterday.toDateString()) {
-            return 'Yesterday';
-        }
+        yesterday.setDate(today.getDate() - 1);
 
-        return messageDate.toLocaleDateString([], {
+        if (date.toDateString() === today.toDateString()) return 'Today';
+        if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+
+        return date.toLocaleDateString([], {
             weekday: 'long',
             year: 'numeric',
             month: 'long',
@@ -191,31 +131,47 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
         });
     };
 
-    const goToUser = async (chatName) => {
-        var id = false;
-        try {
-            const response = await api.post(USERS.LIST, {
-                username: chatName,
-                email: ""
-            });
-            id = response.data.data.at(0).id
-        } catch (err) {
-            handleError(err, 'DANGER');
-        }
-        onDisplaySelect(id, false);
-    }
+    const renderMessages = () => {
+        const grouped = groupMessagesByDate(messages);
+        const username = sessionStorage.getItem("username");
 
+        return Object.entries(grouped).map(([date, dateMessages]) => (
+            <div key={date} className="message-group d-flex flex-column mb-4">
+                <div className="date-header d-flex justify-content-center text-center mb-3">
+                    <span className="date-badge badge px-3 py-1">{formatDateHeader(date)}</span>
+                </div>
+                {dateMessages.map((msg) => {
+                    const isOwn = msg.username === username;
+                    return (
+                        <div key={msg.id} className={`message mb-3 ${isOwn ? 'message-own' : 'message-other'}`}>
+                            <div className={`d-flex flex-column ${isOwn ? 'align-items-end' : 'align-items-start'}`}>
+                                <div className="small text-muted mb-1 mx-2">{msg.username}</div>
+                                <div className="message-content p-2 rounded text-left">
+                                    {isOwn && (
+                                        <div className="message-actions">
+                                            <button className="btn btn-sm btn-link" onClick={() => openEditModal(msg)}>
+                                                <i className="bi bi-pencil"></i>
+                                            </button>
+                                            <button className="btn btn-sm btn-link text-danger" onClick={() => handleDeleteMessage(msg.id)}>
+                                                <i className="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    )}
+                                    <div className="message-text">{msg.text}</div>
+                                    <div className="message-time small text-muted text-end">{formatMessageTime(msg.createdAt)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        ));
+    };
 
     if (!chatId) {
         return (
             <div className="bg-body-tertiary border rounded-3 ms-3">
-                {error && (
-                    <Alert
-                        message={error.message}
-                        status={error.status}
-                        onClose={clearError}
-                    />
-                )}
+                {error && <Alert message={error.message} status={error.status} onClose={clearError} />}
                 <div className="d-flex justify-content-center align-items-center h-100">
                     <p className="text-muted">Select a chat to start messaging</p>
                 </div>
@@ -225,99 +181,32 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
 
     if (loading) {
         return (
-            <div className="display-chat ms-3 justify-content-center align-items-center">
-                <div className="bg-body-tertiary border rounded-3 ms-3 d-flex justify-content-center align-items-center">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
+            <div className="display-chat ms-3 d-flex justify-content-center align-items-center">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
                 </div>
             </div>
         );
     }
 
-
-    const handleMouseEnter = () => setIsHovered(true);
-    const handleMouseLeave = () => {
-        setIsHovered(false);
-        setIsActive(false);
-    };
-    const handleMouseDown = () => setIsActive(true);
-    const handleMouseUp = () => setIsActive(false);
-    const iconClass = isActive ? "bi-send" : isHovered ? "bi-send-fill" : "bi-send";
-
-
-
     return (
-        <div className="display-chat ms-3 justify-content-center align-items-center">
+        <div className="display-chat ms-3">
             <div className="chat-container bg-body-tertiary border rounded-3 d-flex flex-column">
-                {error && (
-                    <Alert
-                        message={error.message}
-                        status={error.status}
-                        onClose={clearError}
-                    />
-                )}
+                {error && <Alert message={error.message} status={error.status} onClose={clearError} />}
 
-                {/* Chat header */}
                 <div className="p-2 border-bottom d-flex justify-content-start">
-                    <h5 className="mb-0 btn btn-outline-warning" onClick={() => { goToUser(chatInfo?.name || 'Chat') }}>{chatInfo?.name || 'Chat'}</h5>
+                    <h5 className="mb-0 btn btn-outline-warning" onClick={() => goToUser(chatInfo?.name || 'Chat')}>
+                        {chatInfo?.name || 'Chat'}
+                    </h5>
                 </div>
 
-                {/* Messages area */}
                 <div className="messages-area flex-grow-1 p-3 overflow-auto">
-                    {Object.entries(groupMessagesByDate(messages)).map(([date, dateMessages]) => (
-                        <div key={date} className="message-group d-flex flex-column  mb-4">
-                            <div className="date-header d-flex justify-content-center text-center mb-3">
-                                <span className="date-badge badge px-3 py-1">
-                                    {formatDateHeader(date)}
-                                </span>
-                            </div>
-                            {dateMessages.map((message) => (
-                                <div
-                                    key={message.id}
-                                    className={`message mb-3 ${message.username === sessionStorage.getItem("username")
-                                        ? 'message-own'
-                                        : 'message-other'
-                                        }`}
-                                >
-                                    <div className={`d-flex flex-column ${message.username === sessionStorage.getItem("username")
-                                        ? 'align-items-end'
-                                        : 'align-items-start'
-                                        }`}>
-                                        <div className=" small text-muted mb-1 mx-2">
-                                            {message.username}
-                                        </div>
-                                        <div className="align-items-start message-content p-2 rounded text-left">
-                                            {message.username === sessionStorage.getItem("username") && (
-                                                <div className="message-actions">
-                                                    <button
-                                                        className="btn btn-sm btn-link"
-                                                        onClick={() => handleUpdateMessage(message.id, prompt('Edit message:', message.text))}>
-                                                        <i className="bi bi-pencil"></i>
-                                                    </button>
-                                                    <button
-                                                        className="btn btn-sm btn-link text-danger"
-                                                        onClick={() => handleDeleteMessage(message.id)}>
-                                                        <i className="bi bi-trash"></i>
-                                                    </button>
-                                                </div>
-                                            )}
-                                            <div className="message-text">{message.text}</div>
-                                            <div className="message-time small text-muted text-end">
-                                                {formatMessageTime(message.createdAt)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
+                    {renderMessages()}
                     <div ref={messagesEndRef} />
                 </div>
 
-                {/* Message input form */}
                 <div className="message-input-area p-3 border-top">
-                    <Form onSubmit={handleSendMessage} className="d-flex gap-2 ">
+                    <Form onSubmit={handleSendMessage} className="d-flex gap-2">
                         <Form.Control
                             type="text"
                             value={newMessage}
@@ -325,18 +214,34 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
                             placeholder="Type a message..."
                             className="flex-grow-1 bg-body-tertiary"
                         />
-                        <Button
-                            type="submit"
-                            className="btn-icon"
-                            variant="primary"
-                            onMouseEnter={handleMouseEnter}
-                            onMouseLeave={handleMouseLeave}
-                            onMouseDown={handleMouseDown}
-                            onMouseUp={handleMouseUp}>
-                            <i className={`bi ${iconClass}`}></i>
+                        <Button type="submit" className="btn-icon" variant="primary">
+                            <i className="bi bi-send-fill"></i>
                         </Button>
                     </Form>
                 </div>
+
+                <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
+                    <Modal.Header closeButton className="bg-dark border-secondary text-light">
+                        <Modal.Title>Edit Message</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body className="bg-dark text-light border-secondary">
+                        <Form.Group>
+                            <Form.Control
+                                as="textarea"
+                                rows={3}
+                                value={editedText}
+                                onChange={(e) => setEditedText(e.target.value)}
+                                className="bg-dark text-light border-secondary"
+                            />
+                        </Form.Group>
+                    </Modal.Body>
+                    <Modal.Footer className="bg-dark text-light border-secondary">
+                        <Button variant="outline-light" onClick={() => setShowEditModal(false)}>Cancel</Button>
+                        <Button variant="primary" onClick={handleUpdateMessage} disabled={!editedText.trim()}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </div>
         </div>
     );
