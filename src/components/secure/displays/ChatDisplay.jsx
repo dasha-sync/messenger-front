@@ -1,12 +1,15 @@
 import { useEffect, useState, useRef } from 'react';
 import { Form, Button } from 'react-bootstrap';
+import SockJS from 'sockjs-client';
 import api from '../../../api/config';
 import { CHATS, MESSAGES, USERS } from '../../../api/routes';
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import Alert from '../../controls/Alert';
 import './ChatDisplay.css';
+import { Client } from '@stomp/stompjs';
 
 const ChatDisplay = ({ chatId, onDisplaySelect }) => {
+    const [stompClient, setStompClient] = useState(null);
     const { error, handleError, clearError } = useErrorHandler();
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -47,16 +50,100 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
         fetchChatData();
     }, [chatId, handleError]);
 
+    useEffect(() => {
+        if (!chatId) return;
+
+        const socket = new SockJS('/ws');
+        const stomp = new Client({
+            webSocketFactory: () => socket,
+            connectHeaders: {
+                // The token is automatically sent in cookies
+            },
+            debug: (str) => {
+                console.log(str);
+            },
+            reconnectDelay: 5000,
+            heartbeatIncoming: 4000,
+            heartbeatOutgoing: 4000,
+        });
+
+        stomp.onConnect = () => {
+            console.log('Connected to WebSocket');
+            // Subscribe to the chat's message topic
+            stomp.subscribe(`/topic/chats/${chatId}/messages`, (message) => {
+                const receivedMessage = JSON.parse(message.body);
+                handleIncomingMessage(receivedMessage);
+            });
+        };
+
+        stomp.onStompError = (frame) => {
+            console.error('STOMP error:', frame);
+            handleError(new Error('WebSocket connection error'), 'DANGER');
+        };
+
+        stomp.activate();
+        setStompClient(stomp);
+
+        // Cleanup on unmount
+        return () => {
+            if (stomp.connected) {
+                stomp.deactivate();
+            }
+        };
+    }, [chatId, handleError]);
+
+    const handleIncomingMessage = (message) => {
+        setMessages(prev => {
+            // Handle different message types
+            switch (message.type) {
+                case 'CREATE':
+                    return [...prev, message];
+                case 'UPDATE':
+                    return prev.map(msg => msg.id === message.id ? message : msg);
+                case 'DELETE':
+                    return prev.filter(msg => msg.id !== message.id);
+                default:
+                    return prev;
+            }
+        });
+    };
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim()) return;
+
+        if (!newMessage.trim() || !stompClient?.connected) return;
 
         try {
-            const response = await api.post(MESSAGES.CREATE(chatId), {
-                text: newMessage
+            stompClient.publish({
+                destination: `/app/chats/${chatId}/messages/create`,
+                body: JSON.stringify({ text: newMessage })
             });
-            setMessages(prev => [...prev, response.data]);
             setNewMessage('');
+        } catch (err) {
+            handleError(err, 'DANGER');
+        }
+    };
+
+    const handleUpdateMessage = async (messageId, newText) => {
+        if (!stompClient?.connected) return;
+
+        try {
+            stompClient.publish({
+                destination: `/app/chats/${chatId}/messages/${messageId}/update`,
+                body: JSON.stringify({ text: newText })
+            });
+        } catch (err) {
+            handleError(err, 'DANGER');
+        }
+    };
+
+    const handleDeleteMessage = async (messageId) => {
+        if (!stompClient?.connected) return;
+
+        try {
+            stompClient.publish({
+                destination: `/app/chats/${chatId}/messages/${messageId}/destroy`
+            });
         } catch (err) {
             handleError(err, 'DANGER');
         }
@@ -201,7 +288,20 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
                                             {message.username}
                                         </div>
                                         <div className="align-items-start message-content p-2 rounded text-left">
-
+                                            {message.username === sessionStorage.getItem("username") && (
+                                                <div className="message-actions">
+                                                    <button
+                                                        className="btn btn-sm btn-link"
+                                                        onClick={() => handleUpdateMessage(message.id, prompt('Edit message:', message.text))}>
+                                                        <i className="bi bi-pencil"></i>
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-sm btn-link text-danger"
+                                                        onClick={() => handleDeleteMessage(message.id)}>
+                                                        <i className="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            )}
                                             <div className="message-text">{message.text}</div>
                                             <div className="message-time small text-muted text-end">
                                                 {formatMessageTime(message.createdAt)}

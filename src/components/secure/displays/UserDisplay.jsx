@@ -19,7 +19,6 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
                     setUser(userResponse.data.data)
                     const relationsResponse = await api.get(USERS.RELATIONS(userId))
                     setRelations(relationsResponse.data.data)
-                    handleError(relationsResponse.data, 'SUCCESS');
                 }
             } catch (err) {
                 handleError(err, 'DANGER');
