@@ -12,5 +12,13 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
+  },
+  define: {
+    global: 'window',
+  },
+  resolve: {
+    alias: {
+      // Add any other aliases if needed
+    }
   }
 })

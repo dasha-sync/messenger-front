@@ -16,11 +16,15 @@ export const AuthProvider = ({ children }) => {
         try {
             const response = await api.get(AUTH.CHECK); // или /me
             setIsAuthenticated(true);
-            setUser(response.data); // опционально
+            console.log(response.data); // опционально
+            if (response?.data) {
+                sessionStorage.setItem("username", response.data.username)
+                sessionStorage.setItem("email", response.data.email)
+            }
+            // eslint-disable-next-line no-unused-vars
         } catch (err) {
             setIsAuthenticated(false);
             setUser(null);
-            handleError(err, 'INFO');
         } finally {
             setIsLoading(false);
         }

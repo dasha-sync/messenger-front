@@ -23,8 +23,8 @@ const SettingsForm = () => {
 
     // Load initial values from localStorage
     useEffect(() => {
-        const username = sessionStorage.getItem('username');
-        const email = sessionStorage.getItem('email');
+        const username = sessionStorage.getItem("username");
+        const email = sessionStorage.getItem("email");
         if (username && email) {
             setCredentials(prev => ({
                 ...prev,
