@@ -1,21 +1,42 @@
 import { ListGroup, Spinner } from 'react-bootstrap';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../../../../api/config';
 import { CHATS } from '../../../../api/routes';
-import DeleteButton from './../../../controls/DeleteButton'
+import DeleteButton from '../../../controls/DeleteButton';
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
+import { useChatsWebSocket } from '../../../../hooks/useChatsWebSocket';
 import Alert from '../../../../components/controls/Alert';
 
 const ChatsList = ({ onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
-    const [chats, setChats] = useState([]);
+    const [chatList, setChatList] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [currentChatId, setCurrentChatId] = useState(null);
+
+    const { error: wsError, clearError: clearWsError } = useChatsWebSocket(
+        useCallback((contactUpdate) => {
+            const { action, ...chatData } = contactUpdate;
+
+            setChatList((prev) => {
+                if (action === 'DELETE') {
+                    if (chatData.id === currentChatId) {
+                        onDisplaySelect(null, false);
+                        setCurrentChatId(null);
+                    }
+                    return prev.filter(chat => chat.id !== chatData.id);
+                } else if (action === 'CREATE') {
+                    return [...prev, chatData];
+                }
+                return prev;
+            });
+        }, [onDisplaySelect, currentChatId])
+    );
 
     useEffect(() => {
         const fetchChats = async () => {
             try {
                 const response = await api.get(CHATS.LIST);
-                setChats(response.data);
+                setChatList(response.data?.data?.chats || []);
             } catch (err) {
                 handleError(err, 'DANGER');
             } finally {
@@ -27,49 +48,35 @@ const ChatsList = ({ onDisplaySelect }) => {
     }, [handleError]);
 
     const handleChatClick = (chatId) => {
+        setCurrentChatId(chatId);
         onDisplaySelect(chatId, true);
     };
 
-    if (loading) {
-        return <Spinner animation="border" />;
-    }
+    if (loading) return <Spinner animation="border" />;
 
-    if (!chats?.data?.chats?.length) {
-        return <div className="text-info">No chats.</div>;
-    }
-    /*
-        const handleDeleteClick = async (chatId) => {
-            try {
-                const response = await api.delete(CHATS.DELETE(chatId));
-                setChats(prevChats => ({
-                    ...prevChats,
-                    data: {
-                        ...prevChats.data,
-                        chats: prevChats.data.chats.filter(chat => chat.id !== chatId)
-                    }
-                }));
-            } catch (err) {
-                handleError(err, 'DANGER');
-            }
-        };*/
+    if (!chatList.length) return <div className="text-info">No chats.</div>;
 
     return (
         <div className="list-parent">
-            {error && (
+            {(error || wsError) && (
                 <Alert
-                    message={error.message}
-                    status={error.status}
-                    onClose={clearError}
+                    message={(error || wsError).message}
+                    status={(error || wsError).status}
+                    onClose={() => {
+                        clearError();
+                        clearWsError();
+                    }}
                 />
             )}
             <div className="list">
                 <ListGroup>
-                    {chats.data.chats.map((chat) => (
+                    {chatList.map((chat) => (
                         <ListGroup.Item
                             key={chat.id}
                             action
                             onClick={() => handleChatClick(chat.id)}
-                            className="bg-body-tertiary hover-border text-start">
+                            className="bg-body-tertiary hover-border text-start"
+                        >
                             <div className="d-flex justify-content-between">
                                 {chat.name}
                             </div>

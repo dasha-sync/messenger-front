@@ -2,7 +2,6 @@ import { ListGroup, Spinner } from 'react-bootstrap';
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../../../api/config';
 import { CONTACTS } from '../../../../api/routes';
-import DeleteButton from './../../../controls/DeleteButton'
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import { useContactsWebSocket } from '../../../../hooks/useContactsWebSocket';
 import Alert from '../../../../components/controls/Alert';
@@ -50,18 +49,6 @@ const ContactsList = ({ onDisplaySelect }) => {
     if (!contacts.data.length) {
         return <div className="text-info">No contacts</div>;
     }
-
-    /*const handleDeleteClick = async (contactId) => {
-        try {
-            const response = await api.delete(CONTACTS.DELETE(contactId));
-            setContacts(prevContacts => ({
-                ...prevContacts,
-                data: prevContacts.data.filter(contact => contact.id !== contactId)
-            }));
-        } catch (err) {
-            handleError(err, 'DANGER');
-        }
-    };*/
 
     return (
         <div className="list-parent">
