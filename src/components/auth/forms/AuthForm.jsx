@@ -25,6 +25,7 @@ const AuthForm = ({ mode = 'signin' }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        console.log('Form submitted with credentials:', credentials);
         await handleAuth(credentials);
     };
 
