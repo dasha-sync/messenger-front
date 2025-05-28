@@ -3,7 +3,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useErrorHandler } from './useErrorHandler';
 
-export const useWebSocket = (chatId, onMessageReceived) => {
+export const useContactsWebSocket = (onContactUpdate) => {
     const { error, handleError, clearError } = useErrorHandler();
     const stompClient = useRef(null);
     const subscriptionRef = useRef(null);
@@ -11,7 +11,7 @@ export const useWebSocket = (chatId, onMessageReceived) => {
 
     const connect = useCallback(() => {
         if (stompClient.current && isConnected.current) {
-            console.log('Already connected');
+            console.log('Already connected to contacts WebSocket');
             return Promise.resolve();
         }
 
@@ -25,7 +25,7 @@ export const useWebSocket = (chatId, onMessageReceived) => {
                 },
                 connectHeaders: {},
                 onConnect: () => {
-                    console.log('Connected to WebSocket');
+                    console.log('Connected to contacts WebSocket');
                     isConnected.current = true;
                     resolve();
                 },
@@ -53,42 +53,35 @@ export const useWebSocket = (chatId, onMessageReceived) => {
         });
     }, []);
 
-    const subscribe = useCallback((callback) => {
+    const subscribe = useCallback(() => {
         if (!stompClient.current || !isConnected.current) {
             console.error('Not connected to WebSocket');
             return null;
         }
 
+        const username = sessionStorage.getItem("username");
+        if (!username) {
+            console.error('No username found in session storage');
+            return null;
+        }
+
         const subscription = stompClient.current.subscribe(
-            `/topic/secured/chats/${chatId}/messages`,
+            `/topic/contacts/${username}`,
             (message) => {
                 try {
-                    const body = JSON.parse(message.body);
-                    callback(body);
+                    const contactUpdate = JSON.parse(message.body);
+                    if (contactUpdate.action === 'DELETE') {
+                        onContactUpdate(contactUpdate);
+                    }
                 } catch (error) {
-                    console.error('Error parsing message:', error);
+                    console.error('Error parsing contact update message:', error);
                 }
             }
         );
 
         subscriptionRef.current = subscription;
         return subscription;
-    }, [chatId]);
-
-    const publish = useCallback((destination, body) => {
-        if (!stompClient.current || !isConnected.current) {
-            console.error('Not connected to WebSocket');
-            return;
-        }
-
-        stompClient.current.publish({
-            destination,
-            body: JSON.stringify(body),
-            headers: {
-                'content-type': 'application/json'
-            }
-        });
-    }, []);
+    }, [onContactUpdate]);
 
     const disconnect = useCallback(() => {
         if (subscriptionRef.current) {
@@ -102,30 +95,22 @@ export const useWebSocket = (chatId, onMessageReceived) => {
     }, []);
 
     useEffect(() => {
-        if (chatId) {
-            connect()
-                .then(() => {
-                    subscribe((message) => {
-                        console.log('Received message:', message);
-                        if (onMessageReceived) {
-                            onMessageReceived(message);
-                        }
-                    });
-                })
-                .catch((error) => {
-                    handleError(error, 'DANGER');
-                });
-        }
+        connect()
+            .then(() => {
+                subscribe();
+            })
+            .catch((error) => {
+                handleError(error, 'DANGER');
+            });
 
         return () => {
             disconnect();
         };
-    }, [chatId, connect, subscribe, disconnect, handleError, onMessageReceived]);
+    }, [connect, subscribe, disconnect, handleError]);
 
     return {
         error,
         clearError,
-        publish,
         isConnected: isConnected.current
     };
 };

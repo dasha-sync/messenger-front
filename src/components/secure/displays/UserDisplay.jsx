@@ -160,14 +160,11 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
                         </div>
                     </div>
 
-                    {/* Actions Card */}
                     <div className="card bg-body-tertiary">
                         <div className="card-header bg-transparent d-flex justify-content-start  align-items-end mb-1">
                             <h5 className="mb-0">Actions Menu</h5>
                         </div>
                         <div className="card-body">
-                            {/* Chat Actions */}
-                            {/* Contact Actions */}
                             <div className="">
                                 {relations.hasChat ? (
                                     <></>

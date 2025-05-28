@@ -13,7 +13,7 @@ export default defineConfig({
       },
       '/ws': {
         target: 'http://localhost:8080',
-        ws: true, // 👈 ОБЯЗАТЕЛЬНО для WebSocket!
+        ws: true,
         changeOrigin: true
       }
     }
@@ -23,7 +23,6 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      // Add any other aliases if needed
     }
   }
 })

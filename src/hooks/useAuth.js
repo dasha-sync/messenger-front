@@ -20,22 +20,38 @@ export const useAuth = (isSignUp = false) => {
                 if (!signUpResponse.data.data) {
                     throw new Error('Invalid signup response');
                 }
-                // After successful signup, proceed with signin
                 credentials = { username: credentials.username, password: credentials.password };
             }
 
-            const signInResponse = await api.post(AUTH.SIGNIN, credentials, { timeout: 5000 });
+            const signInResponse = await api.post(AUTH.SIGNIN, credentials, {
+                timeout: 5000,
+                withCredentials: true
+            });
 
-            if (signInResponse.data?.data?.token) {
+            if (signInResponse.data?.data?.user) {
                 sessionStorage.setItem('username', signInResponse.data.data.user.username);
                 sessionStorage.setItem('email', signInResponse.data.data.user.email);
+
                 window.dispatchEvent(new Event('authChange'));
-                navigate('/');
+
+                try {
+                    const checkResponse = await api.get(AUTH.CHECK);
+                    if (checkResponse.data?.authenticated) {
+                        navigate('/');
+                    } else {
+                        throw new Error('Authentication check failed');
+                    }
+                } catch (checkError) {
+                    console.error('Auth check failed:', checkError);
+                    handleError(checkError, 'DANGER');
+                    sessionStorage.clear();
+                }
             } else {
                 throw new Error('Invalid signin response');
             }
         } catch (err) {
             handleError(err, 'DANGER');
+            sessionStorage.clear();
         } finally {
             setIsLoading(false);
         }

@@ -17,6 +17,7 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
     const [editedText, setEditedText] = useState('');
     const [showEditModal, setShowEditModal] = useState(false);
     const messagesEndRef = useRef(null);
+    const hasMounted = useRef(false);
 
     const { publish, isConnected } = useWebSocket(chatId, useCallback((message) => {
         const updateMessages = {
@@ -28,11 +29,17 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
     }, []));
 
     useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        if (!messagesEndRef.current) return;
+
+        const behavior = hasMounted.current ? 'smooth' : 'auto';
+        messagesEndRef.current.scrollIntoView({ behavior });
+
+        hasMounted.current = true;
     }, [messages]);
 
     useEffect(() => {
         if (!chatId) return;
+        hasMounted.current = false;
 
         const fetchChatData = async () => {
             setLoading(true);
@@ -149,12 +156,33 @@ const ChatDisplay = ({ chatId, onDisplaySelect }) => {
                                 <div className="message-content p-2 rounded text-left">
                                     {isOwn && (
                                         <div className="message-actions">
-                                            <button className="btn btn-sm btn-link" onClick={() => openEditModal(msg)}>
-                                                <i className="bi bi-pencil"></i>
-                                            </button>
-                                            <button className="btn btn-sm btn-link text-danger" onClick={() => handleDeleteMessage(msg.id)}>
-                                                <i className="bi bi-trash"></i>
-                                            </button>
+                                            <div className="dropdown">
+                                                <button
+                                                    className="btn btn-sm btn-link dropdown-toggle"
+                                                    type="button"
+                                                    data-bs-toggle="dropdown"
+                                                    aria-expanded="false">
+                                                    <i className="bi bi-three-dots-vertical"></i>
+                                                </button>
+                                                <ul className="dropdown-menu dropdown-menu-end">
+                                                    <li>
+                                                        <button
+                                                            className="dropdown-item"
+                                                            onClick={() => openEditModal(msg)}>
+                                                            <i className="bi bi-pencil me-2"></i>
+                                                            Edit
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button
+                                                            className="dropdown-item text-danger"
+                                                            onClick={() => handleDeleteMessage(msg.id)}>
+                                                            <i className="bi bi-trash me-2"></i>
+                                                            Delete
+                                                        </button>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                     )}
                                     <div className="message-text">{msg.text}</div>

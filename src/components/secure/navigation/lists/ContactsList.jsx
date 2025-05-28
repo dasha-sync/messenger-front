@@ -1,15 +1,25 @@
 import { ListGroup, Spinner } from 'react-bootstrap';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../../../../api/config';
 import { CONTACTS } from '../../../../api/routes';
 import DeleteButton from './../../../controls/DeleteButton'
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
+import { useContactsWebSocket } from '../../../../hooks/useContactsWebSocket';
 import Alert from '../../../../components/controls/Alert';
 
 const ContactsList = ({ onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [contacts, setContacts] = useState([]);
     const [loading, setLoading] = useState(true);
+
+    const handleContactUpdate = useCallback((contactUpdate) => {
+        setContacts(prevContacts => ({
+            ...prevContacts,
+            data: prevContacts.data.filter(contact => contact.id !== contactUpdate.id)
+        }));
+    }, []);
+
+    const { error: wsError, clearError: clearWsError } = useContactsWebSocket(handleContactUpdate);
 
     useEffect(() => {
         const fetchContacts = async () => {
@@ -55,11 +65,14 @@ const ContactsList = ({ onDisplaySelect }) => {
 
     return (
         <div className="list-parent">
-            {error && (
+            {(error || wsError) && (
                 <Alert
-                    message={error.message}
-                    status={error.status}
-                    onClose={clearError}
+                    message={(error || wsError).message}
+                    status={(error || wsError).status}
+                    onClose={() => {
+                        clearError();
+                        clearWsError();
+                    }}
                 />
             )}
             <div className="list">
