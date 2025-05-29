@@ -14,15 +14,16 @@ const ChatsList = ({ onDisplaySelect }) => {
     const [currentChatId, setCurrentChatId] = useState(null);
 
     const { error: wsError, clearError: clearWsError } = useChatsWebSocket(
-        useCallback((contactUpdate) => {
-            const { action, ...chatData } = contactUpdate;
+        useCallback((chatsUpdate) => {
+            const { action, ...chatData } = chatsUpdate;
+
+            if (action === 'DELETE' && chatData.id === currentChatId) {
+                onDisplaySelect(null, false);
+                setCurrentChatId(null);
+            }
 
             setChatList((prev) => {
                 if (action === 'DELETE') {
-                    if (chatData.id === currentChatId) {
-                        onDisplaySelect(null, false);
-                        setCurrentChatId(null);
-                    }
                     return prev.filter(chat => chat.id !== chatData.id);
                 } else if (action === 'CREATE') {
                     return [...prev, chatData];

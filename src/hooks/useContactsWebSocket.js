@@ -70,7 +70,7 @@ export const useContactsWebSocket = (onContactUpdate) => {
             (message) => {
                 try {
                     const contactUpdate = JSON.parse(message.body);
-                    if (contactUpdate.action === 'DELETE') {
+                    if (contactUpdate.action === 'DELETE' || contactUpdate.action === 'CREATE') {
                         onContactUpdate(contactUpdate);
                     }
                 } catch (error) {
