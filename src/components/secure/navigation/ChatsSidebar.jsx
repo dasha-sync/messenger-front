@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import api from '../../../api/config';
 import { REQUESTS } from '../../../api/routes';
 import { Nav, ListGroup } from 'react-bootstrap';
@@ -10,12 +10,28 @@ import SearchList from './lists/SearchList'
 import './ChatsSidebar.css'
 import { useErrorHandler } from '../../../hooks/useErrorHandler';
 import Alert from '../../../components/controls/Alert';
+import { useReceivedRequestsWebSocket } from '../../../hooks/useReceivedRequestsWebSocket';
 
 const ChatsSidebar = ({ onDisplaySelect }) => {
     const [activeTab, setActiveTab] = useState('chats');
     const [incomingRequests, setIncomingRequests] = useState([]);
     const [loadingRequests, setLoadingRequests] = useState(true);
     const { error, handleError, clearError } = useErrorHandler();
+
+    const { error: wsError, clearError: clearWsError } = useReceivedRequestsWebSocket(
+        useCallback((receivedRequestUpdate) => {
+            const { action, ...receivedRequestData } = receivedRequestUpdate;
+
+            setIncomingRequests((prev) => {
+                if (action === 'DELETE') {
+                    return prev.filter(request => request.id !== receivedRequestData.id);
+                } else if (action === 'CREATE') {
+                    return [...prev, receivedRequestData];
+                }
+                return prev;
+            });
+        }, [])
+    );
 
     useEffect(() => {
         const fetchIncomingRequests = async () => {
@@ -66,11 +82,14 @@ const ChatsSidebar = ({ onDisplaySelect }) => {
 
     return (
         <div className="chats-container bg-body-tertiary border rounded-3 p-2">
-            {error && (
+            {(error || wsError) && (
                 <Alert
-                    message={error.message}
-                    status={error.status}
-                    onClose={clearError}
+                    message={(error || wsError).message}
+                    status={(error || wsError).status}
+                    onClose={() => {
+                        clearError();
+                        clearWsError();
+                    }}
                 />
             )}
             <div className="d-flex flex-row justify-content-center">
