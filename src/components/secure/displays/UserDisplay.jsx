@@ -10,11 +10,13 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
     const [user, setUser] = useState(null);
     const [relations, setRelations] = useState({});
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const [lastDisplayedUserId, setLastDisplayedUserId] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 if (userId) {
+                    setLastDisplayedUserId(userId);
                     const userResponse = await api.get(USERS.GET_BY_ID(userId))
                     setUser(userResponse.data.data)
                     const relationsResponse = await api.get(USERS.RELATIONS(userId))
@@ -25,7 +27,7 @@ const UserDisplay = ({ userId, onDisplaySelect }) => {
             }
         };
         fetchData();
-    }, [userId, handleError, refreshTrigger]);
+    }, [userId, handleError, refreshTrigger, lastDisplayedUserId]);
 
     if (!userId) {
         return (
