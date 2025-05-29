@@ -1,21 +1,33 @@
 import { ListGroup, Spinner } from 'react-bootstrap';
 import api from '../../../../api/config';
 import { REQUESTS } from '../../../../api/routes';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useErrorHandler } from '../../../../hooks/useErrorHandler';
 import Alert from '../../../../components/controls/Alert';
+import { useReceivedRequestsWebSocket } from '../../../../hooks/useReceivedRequestsWebSocket';
 
 const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) => {
     const { error, handleError, clearError } = useErrorHandler();
     const [requests, setRequests] = useState(incomingRequests);
 
-    if (loading) {
-        return <Spinner animation="border" />;
-    }
+    const { error: wsError, clearError: clearWsError } = useReceivedRequestsWebSocket(
+        useCallback((receivedRequestUpdate) => {
+            const { action, ...receivedRequestData } = receivedRequestUpdate;
 
-    if (!incomingRequests.length) {
-        return <div className="text-info">No incoming requests</div>;
-    }
+            setRequests((prev) => {
+                if (action === 'DELETE') {
+                    return prev.filter(request => request.id !== receivedRequestData.id);
+                } else if (action === 'CREATE') {
+                    return [...prev, receivedRequestData];
+                }
+                return prev;
+            });
+        }, [])
+    );
+
+    if (loading) return <Spinner animation="border" />;
+
+    if (!incomingRequests.length) return <div className="text-info">No incoming requests</div>;
 
     const handleApproveClick = async (reqId) => {
         try {
@@ -37,17 +49,18 @@ const ReceivedRequestsList = ({ incomingRequests, loading, onDisplaySelect }) =>
         }
     }
 
-    const handleUserClick = (userId) => {
-        onDisplaySelect(userId, false)
-    }
+    const handleUserClick = (userId) => onDisplaySelect(userId, false)
 
     return (
         <div className="list-parent">
-            {error && (
+            {(error || wsError) && (
                 <Alert
-                    message={error.message}
-                    status={error.status}
-                    onClose={clearError}
+                    message={(error || wsError).message}
+                    status={(error || wsError).status}
+                    onClose={() => {
+                        clearError();
+                        clearWsError();
+                    }}
                 />
             )}
             <div className="list">
