@@ -12,10 +12,16 @@ const ContactsList = ({ onDisplaySelect }) => {
     const [loading, setLoading] = useState(true);
 
     const handleContactUpdate = useCallback((contactUpdate) => {
-        setContacts(prevContacts => ({
-            ...prevContacts,
-            data: prevContacts.data.filter(contact => contact.id !== contactUpdate.id)
-        }));
+        const { action, ...contactData } = contactUpdate;
+
+        setContacts(prev => {
+            if (action === 'DELETE') {
+                return prev.filter(contact => contact.id !== contactUpdate.id)
+            } else if (action === 'CREATE') {
+                return [...prev, contactData];
+            }
+            return prev;
+        });
     }, []);
 
     const { error: wsError, clearError: clearWsError } = useContactsWebSocket(handleContactUpdate);
@@ -27,7 +33,7 @@ const ContactsList = ({ onDisplaySelect }) => {
                     username: "",
                     email: ""
                 });
-                setContacts(response.data);
+                setContacts(response.data?.data);
             } catch (err) {
                 handleError(err, 'DANGER');
             } finally {
@@ -38,17 +44,11 @@ const ContactsList = ({ onDisplaySelect }) => {
         fetchContacts();
     }, [handleError]);
 
-    const handleUserClick = (userId) => {
-        onDisplaySelect(userId, false);
-    };
+    const handleUserClick = (userId) => onDisplaySelect(userId, false);
 
-    if (loading) {
-        return <Spinner animation="border" />;
-    }
+    if (loading) return <Spinner animation="border" />;
 
-    if (!contacts.data.length) {
-        return <div className="text-info">No contacts</div>;
-    }
+    if (!contacts.length) return <div className="text-info">No contacts</div>;
 
     return (
         <div className="list-parent">
@@ -64,7 +64,7 @@ const ContactsList = ({ onDisplaySelect }) => {
             )}
             <div className="list">
                 <ListGroup>
-                    {contacts.data.map((contact) => (
+                    {contacts.map((contact) => (
                         <ListGroup.Item
                             key={contact.id}
                             action

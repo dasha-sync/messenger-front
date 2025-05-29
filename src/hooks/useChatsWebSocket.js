@@ -3,7 +3,7 @@ import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useErrorHandler } from './useErrorHandler';
 
-export const useChatsWebSocket = (onContactUpdate) => {
+export const useChatsWebSocket = (onChatUpdate) => {
     const { error, handleError, clearError } = useErrorHandler();
     const stompClient = useRef(null);
     const subscriptionRef = useRef(null);
@@ -69,19 +69,19 @@ export const useChatsWebSocket = (onContactUpdate) => {
             `/topic/chats/${username}`,
             (message) => {
                 try {
-                    const contactUpdate = JSON.parse(message.body);
-                    if (contactUpdate.action === 'DELETE' || contactUpdate.action === 'CREATE') {
-                        onContactUpdate(contactUpdate);
+                    const chatUpdate = JSON.parse(message.body);
+                    if (chatUpdate.action === 'DELETE' || chatUpdate.action === 'CREATE') {
+                        onChatUpdate(chatUpdate);
                     }
                 } catch (error) {
-                    console.error('Error parsing contact update message:', error);
+                    console.error('Error parsing chat update message:', error);
                 }
             }
         );
 
         subscriptionRef.current = subscription;
         return subscription;
-    }, [onContactUpdate]);
+    }, [onChatUpdate]);
 
     const disconnect = useCallback(() => {
         if (subscriptionRef.current) {
