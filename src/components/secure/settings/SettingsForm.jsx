@@ -134,8 +134,13 @@ const SettingsForm = () => {
 
                         if (updateResponse.data?.data?.token) {
                             handleError(updateResponse.data, 'SUCCESS');
-                            sessionStorage.setItem('username', updateResponse.data.data.user.username);
-                            sessionStorage.setItem('email', updateResponse.data.data.user.email);
+                            sessionStorage.clear();
+                            localStorage.clear();
+                            document.cookie.split(";").forEach(cookie => {
+                                const [name] = cookie.split("=");
+                                document.cookie = `${name.trim()}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+                            });
+                            navigate('/welcome');
                             navigate('/settings');
                         }
                     } catch (updateError) {
