@@ -1,0 +1,26 @@
+name: Notify Infra Repo
+
+on:
+  push:
+    branches:
+      - main  # или твоя ветка
+
+jobs:
+  build-and-push:
+    needs: checkstyle
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build Docker image
+        run: docker build -t dashasync/messenger-front:latest .
+
+      - name: Push Docker image
+        run: docker push dashasync/messenger-front:latest

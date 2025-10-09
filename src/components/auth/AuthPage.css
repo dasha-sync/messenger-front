@@ -1,0 +1,32 @@
+.welcome-text {
+    color: #b7ff5d;
+    margin-bottom: 10%;
+    font-size: 150px;
+    min-width: max-content;
+}
+
+.text-center {
+    width: max-content;
+}
+
+.centerize {
+    margin-top: 100%;
+}
+
+.centerize-form {
+    margin-top: 70%;
+}
+
+.info {
+    color: #b7ff5d;
+}
+
+.info a {
+    text-decoration: underline;
+    color: var(--bs-info);
+}
+
+.info a:hover {
+    text-decoration: underline;
+    color: #b7ff5d;
+}

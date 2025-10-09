@@ -1,0 +1,116 @@
+.custom-tabs .nav-link.active {
+    border-bottom-color: var(--bs-tertiary-bg);
+    background-color: var(--bs-tertiary-bg);
+    white-space: nowrap;
+}
+
+.hover-border:hover {
+    border: 1px solid #8ec736 !important;
+    margin-bottom: 2px;
+}
+
+.hover-border {
+    border: 1px solid var(--bs-border-color) !important;
+    margin-bottom: 3px;
+    border-radius: 8px !important;
+}
+
+.hover-border:first-child:hover {
+    margin-bottom: 3px;
+}
+
+.nav-link {
+    color: #b7ff5d;
+}
+
+.nav-link:hover {
+    color: #b7ff5d;
+}
+
+.list {
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.list > * {
+    margin-right: 8px;
+}
+
+.list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+    margin-left: 3px;
+}
+
+.list::-webkit-scrollbar-corner{
+    background: var(--bs-tertiary-bg);
+}
+
+.list::-webkit-scrollbar-track {
+    background: var(--bs-tertiary-bg);
+}
+
+.list::-webkit-scrollbar-thumb {
+    background-color: var(--bs-border-color);
+     border-radius: 10px;
+}
+
+.list::-webkit-scrollbar-thumb:hover {
+    background-color: #8ec736;
+    border-radius: 10px;
+}
+
+.list-parent {
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.search {
+    flex-shrink: 0;
+}
+
+/* Custom scrollbar for messages area */
+.horizontal-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-corner{
+    background: var(--bs-tertiary-bg);
+}
+
+.horizontal-scroll::-webkit-scrollbar-track {
+    background: var(--bs-tertiary-bg);
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb {
+    background-color: var(--bs-border-color);
+     border-radius: 10px;
+}
+
+.horizontal-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: #8ec736;
+     border-radius: 10px;
+}
+
+.notification-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 6px;
+    margin-bottom: 8px;
+    background-color: #da213a;
+    border: 1px solid #61161f;
+    border-radius: 50%;
+}
+
+.incoming-request {
+    display: flex;
+
+}
+
+.btn-request {
+    padding-bottom: 0;
+    padding-top: 0;
+}
